@@ -1,0 +1,64 @@
+{% extends 'adm/base.html' %}
+{% load static %}
+
+{% block content %}
+
+  <div class="card">
+    <div class="card-group">
+    <table class="table-hover table">
+    <thead>
+        <tr class="table-info col-md-12">
+            <td>ID</td>
+            <td>date</td>
+            <td>user</td>
+            <td>order no</td>
+            <td>amount</td>
+            <td>Payment Mode</td>
+            <td>status</td>
+            <td>delivery address</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in orderitem %}
+        <form action="{% url 'status_update' item.id %}" method="post">
+            {% csrf_token %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.created_at }}</td>
+                <td>{{ item.user }}</td>
+                <td>{{ item.tracking_no }}</td>
+                <td>{{ item.total_price }}</td>
+                <td>{{ item.payment_mode }}</td>
+
+                <td>
+                    <select class="form-select" name="status" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                        <option aria-placeholder="{{ item.status }}">{{ item.status }}</option>
+                        {% for status_code, status_display in item.orderstatuses %}
+                        <option name="status" value="{{ status_code }}">{{ status_code }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+
+                <td>{{ item.address }}</td>
+
+                <td>
+                    <button type="submit" class="btn btn-info">Update</button>
+                </td>
+                <td>
+                    <a href="{% url 'generate-pdf' %}" class="btn btn-secondary">DownloadPDF</a>
+                </td>
+                
+                
+            </tr>
+        </form>
+        {% endfor %}
+        
+    </tbody>
+</table>
+
+    </table>
+</div>
+</div>
+    
+{% endblock %}

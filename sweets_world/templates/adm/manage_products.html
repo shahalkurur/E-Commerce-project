@@ -1,0 +1,40 @@
+{% extends 'adm/base.html' %}
+{% load static %}
+
+{% block content %}
+
+    
+  
+    <table class="table table-hover-bordered">
+        <thead>
+          <tr class="table-info">
+              <td>ID</td>
+              <td>PRODUCT</td>
+              <td>CATEGORY</td>
+              <td>PRICE</td>
+              <td>STOCK</td>
+              <td>DISCRIPTION</td>
+          </tr>
+        </thead>
+        <tbody>
+            {% for prod in Products %}
+            <tr>
+                <td> {{prod.id}}</td>
+                <td> {{prod.prod_name}} </td>
+                <td> {{prod.category}} </td>
+                <td> {{prod.price}} </td>
+                <td> {{prod.stock}} </td>
+                <td> {{prod.description}} </td>
+                <td><a href="/edit_products/{{prod.id}}"><button type="button" class="btn btn-primary">EDIT</button></a></td>
+                <td><a href="/delete_products/{{prod.id}}"><button type="button" class="btn btn-primary">DELETE</button></a></td>
+            </tr> 
+            {% endfor %}
+            <tr>
+                <td>
+                    <a href="/add_products"><button type="button" class="btn btn-primary">ADD</button></a></td>
+                    
+            </tr>
+        </tbody>
+    </table>
+    
+{% endblock %}

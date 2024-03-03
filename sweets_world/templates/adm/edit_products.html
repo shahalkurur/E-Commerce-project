@@ -1,0 +1,127 @@
+{% extends 'adm/base.html' %}
+{% load static %}
+{% block content %}
+<div class="col-md-6">
+   
+    <form action="/update_product/{{prod.id}}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <label for="formFile" class="form-label">Current category : {{ prod.category }}</label><br>
+        <select class="form-select" aria-label="Default select example" name='category'>
+            <label>select category</label>
+            <option selected>Select category</option>
+            {% for cat in Category %}
+                <option value="{{cat.id}}">{{cat.category_name}}</option>
+            {% endfor %}
+        </select><br>
+    
+        
+        <!-- <input placeholder="{{ prod.category }}" class="form-control" type="text"><br> -->
+        <input placeholder="{{ prod.prod_name }}" class="form-control" type="text" name="name" ><br>
+        <label for="formFile" class="form-label">Product image</label>
+        <input class="form-control" type="file" name="imag" placeholder="{{prod.prod_image}}"><br>
+        </div>
+        <div id="alert-box"></div>
+        <div class="image-box border">
+        </div><br>
+        <!-- <form action="" id="image-form">
+            {% csrf_token %}
+            {{form.as_p}}
+            <button type="submit" class="mt-3 not-visible btn btn-primary" id="confirm_btn">confirm</button>
+        </form> -->
+        <input placeholder="{{ prod.price }}" class="form-control" type="number" name="price" ><br>
+        <input placeholder="{{ prod.stock }}" class="form-control" type="number" name="stock"><br>
+        <input placeholder="{{ prod.description }} "class="form-control" type="text" name="discription"><br>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+<!-- <script>
+    const alertBox = document.getElementById('alert-box');
+    const imageBox = document.getElementById('image-box');
+    const imageForm = document.getElementById('image-form');
+    console.log(imageForm)
+    const confirm_btn = document.getElementById('confirm_btn');
+    const input = document.getElementById('id_prod_image');
+    const csrf = document.getElementById('csrfmiddlewaretoken');
+
+    input.addEventListener('change',()=>{
+        console.log('changed')
+        const img_data = input.files[0]
+        const url = URL.createObjectURL(img_data)
+        imageBox.innerHTML= `<img src="${url}" id="image" width="400px">`
+
+    })
+
+    var $image=$('#image');
+$image.Cropper({
+  aspectRatio: 16 / 9,
+  crop:function(event) {
+    console.log(event.detail.x);
+    console.log(event.detail.y);
+    console.log(event.detail.width);
+    console.log(event.detail.height);
+    console.log(event.detail.rotate);
+    console.log(event.detail.scaleX);
+    console.log(event.detail.scaleY);
+  },
+});
+    var cropper = $image.data('cropper');
+</script> -->
+<script>
+    const alertBox = document.getElementById('alert-box');
+    const imageBox = document.getElementById('image-box');
+    const imageForm = document.getElementById('image-form');
+    const confirmBtn = document.getElementById('confirm_btn');
+    const input = document.getElementById('id_prod_image');
+    const existingImageUrl = "{{ prod.prod_image.url }}";  // Update with the actual URL
+
+    // Display the existing image in the image box
+    imageBox.innerHTML = `<img src="${existingImageUrl}" id="image" width="400px">`;
+
+    // Initialize Cropper on the existing image
+    const $image = $('#image');
+    $image.Cropper({
+        aspectRatio: 16 / 9,
+        crop: function (event) {
+            console.log(event.detail.x);
+            console.log(event.detail.y);
+            console.log(event.detail.width);
+            console.log(event.detail.height);
+            console.log(event.detail.rotate);
+            console.log(event.detail.scaleX);
+            console.log(event.detail.scaleY);
+        },
+    });
+
+    // Make the Cropper instance accessible to other parts of your script
+    const cropper = $image.data('cropper');
+
+    // Attach event listener to the form to prevent its default behavior and submit the cropped image data
+    imageForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        // Get the cropped data and append it to your form
+        const canvas = cropper.getCroppedCanvas();
+        canvas.toBlob((blob) => {
+            const formData = new FormData(imageForm);
+            formData.append('cropped_image', blob, 'cropped_image.png');
+
+            // Now you can submit the form with the cropped image data
+            fetch(imageForm.action, {
+                method: 'POST',
+                body: formData,
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    // Handle the response from the server, e.g., display a success message
+                    console.log(data);
+                })
+                .catch((error) => {
+                    // Handle errors
+                    console.error('Error:', error);
+                });
+        });
+    });
+</script>
+
+{% endblock %}
+

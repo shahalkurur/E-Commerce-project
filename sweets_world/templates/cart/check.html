@@ -1,0 +1,348 @@
+{% extends 'index_base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section-content padding-y bg">
+    <div class="container">
+        <!-- ============================ COMPONENT 1 ================================= -->
+        <form action="{% url 'placeorder' %}" method="POST">
+            {% csrf_token %}
+            <div>
+                <label for="country_2" class="required">Select Address:</label>
+                <select id="addressDropdown" name="address">
+                    <option selected>Choose</option>
+                    {% for ad in addrs %}
+                        <option value="{{ad.id}}">{{ad.first_name}} {{ad.addressline1}}</option>
+                    {% endfor %}
+                </select>
+                
+                
+            </div>
+            <div class="row">
+                <aside class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="billing-form-wrap">
+                                <form action="{% url 'add_addrs' %}" method="post">
+                                    {% csrf_token %}
+                            
+                                    <div class="checkout-box-wrap">
+                                        <div class="single-input-item">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="ship_to_different" data-toggle="modal" data-target="#addressModal">
+                                                <label class="custom-control-label" for="ship_to_different">Ship to a different address?</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                             <!-- Bootstrap Modal for the form -->
+                    <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="addressModalLabel">Add Address</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="address-form" action="{% url 'add_addrs' %}" method="post" >
+                                        {% csrf_token %}
+                                        <div class="row">
+                                            <div class="col-lg-6 ">
+                                                <div class="single-input-item for">
+                                                    <label for="adfirst_name" class="required">Full Name</label>
+                                                    <input type="text" class="form-control" id="adfirst_name" name="fname" placeholder="Fist Name"  />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 ">
+                                                <div class="single-input-item for">
+                                                    <label for="adfirst_name" class="required">Full Name</label>
+                                                    <input type="text" class="form-control" id="" name="lastname" placeholder="Last Name"  />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="single-input-item">
+                                                    <label for="ademail" class="required">Email Address</label>
+                                                    <input type="email"  class="form-control" id="ademail" name="email" placeholder="Email Address"  />
+                                                </div>
+                                            </div>
+                                    
+                                            <div class="col-lg-6">
+                                                <div class="single-input-item">
+                                                    <label for="adph_no" class="required">Phone No.</label>
+                                                    <input type="text"  class="form-control" id="adph_no" name="phonenumber" placeholder="Phone Number"  />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    
+                                        <div class="single-input-item">
+                                            <label for="adaddressline1" class="required">Address</label>
+                                            <textarea id="adaddressline1"  class="form-control" name="address" placeholder="Address" ></textarea>
+                                        </div>
+                                    
+                                        <div class="row">
+                                            
+                                    
+                                            <div class="col-lg-3">
+                                                <div class="single-input-item">
+                                                    <label for="adstate" class="required">State</label>
+                                                    <input type="text"  class="form-control" id="adstate" name="state" placeholder="State" required />
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-lg-3">
+                                                <div class="single-input-item">
+                                                    <label for="adpin" class="required">Pin</label>
+                                                    <input type="text"  class="form-control" id="adpin" name="pin" placeholder="Pin"  />
+                                                </div>
+                                                <input type="text" value="checkout" name="check" hidden>
+                                            </div>
+                                        </div>
+                                    
+                                        <div class="single-input-item">
+                                            <button class="btn-login btn-add-to-cart" id="submit-button">Save Changes</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                 
+                    
+                </div>
+            </div>
+
+             
+                    <!-- card.// -->
+                </aside> <!-- col.// -->
+                <aside class="col-lg-6">
+                    <div class="card">
+                        <table class="table table-borderless table-shopping-cart">
+                            <thead class="text-muted">
+                                <tr class="small text-uppercase">
+                                    <th scope="col">Product</th>
+                                    <th scope="col" width="120">Quantity</th>
+                                    <th scope="col" width="120">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart_items %}
+                                    <tr>
+                                        <td>
+                                            <figure class="itemside align-items-center">
+                                                <div class="aside"><img src="{{ item.product.prod_image.url }}" class="img-sm"></div>
+                                                <figcaption class="info">
+                                                    <a href="/product_detail/{{ item.product.id }}" class="title text-dark">{{ item.product.prod_name }}</a>
+                                                    <p class="text-muted small">{{ item.product.prod_name }}<br>{{ item.product.description }} </p>
+                                                </figcaption>
+                                            </figure>
+                                        </td>
+                                        <td>
+                                            <div class="col product-data">
+                                                <div class="input-group input-spinner product-data">
+                                                   
+                                                    <label type="text" class=" qty-input quantity-element">{{ item.quandity }}</label>
+                                                    
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="price-wrap">
+                                                <var class="price">Rs.{{ item.sub_total|stringformat:'d' }}</var>
+                                                <small class="text-muted">Rs. {{ item.product.price|stringformat:'d' }}/Kg </small>
+                                            </div>
+                                        </td>
+                                        
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% if coupen %}
+                        
+
+                        <div class="card-body col-sm-10  ">
+                            <div class="alert alert-success  " role="alert">
+                                you got {{coupen.discount}}% Discount by coupen {{coupen.code}}
+                           </div> 
+                        </div>
+                        {% endif %}
+                   
+
+                        
+                            
+                            <div class="container mt-4">
+                                <div class="row">
+                                    {% if coupen %}
+                                    <div class="col-md-12">
+                                        <dl class="dlist-align mb-4">
+                                            <dt style="margin-left: 20px;">Total price with tax:</dt>
+                                            <dd style="text-align: end;" class="mr-3 text-muted">Rs:<del style="color: red;"> {{grnd_total}}</del></dd>
+                                        </dl>
+                                    </div>
+                                    {% endif %}
+                                        <div class="col-md-12">
+                            
+                                        <dl class="dlist-align">
+                                            <dt style="margin-left: 20px;">Price to be Paid:</dt>
+                                            <dd style="text-align: end;" class="mr-3 text-dark">Rs: {{grand}}</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        
+                        <div class="card-body">
+                            {% if messages %}
+                            {% for message in messages %}
+                            <p>{{message}}</p>
+                            {% endfor %}
+                            {% endif %}
+                            
+
+                            
+                            {% if wallet and wallet.my_wallet > 0 %}
+                            <input type="hidden" value="wallet" name="paymentmode">
+                            <div class="alert alert-success  items-center" role="alert">
+                                
+                                You have ₹ {{wallet.my_wallet}} in Your Wallet..! to Redeem 
+                                 <button type="submit" class="text-success btn" >click</button>
+                                
+                                <input type="hidden" name="wallet" value="wallet">
+                            </div>
+                            {% else %}
+                            <input type="hidden" value="COD" name="paymentmode">
+                            {% endif %}
+
+                            <input type="hidden" value="{{grand}}" name="total">
+
+                             <button type="submit" class="btn btn-secondary btn-block">COD| place order</button><br>
+                             <button type="submit" class="btn btn-secondary btn-block razor_pay">razor pay</button><br>
+
+                            <div id="paypal-button-container"></div>
+
+                        </div> <!-- card-body.// -->
+                        
+                    </div> <!-- card.// -->
+                    
+                </aside> <!-- col.// -->
+                
+            </div> <!-- row.// -->
+        </form>
+        <!-- ============================ COMPONENT 1 END .// ================================= -->
+    </div> <!-- container .//  -->
+</section>
+{% endblock %}
+
+{% block scripts %} 
+ <script src="https://checkout.razorpay.com/v1/checkout.js"></script> 
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script src="https://www.paypal.com/sdk/js?client-id=AeDTbc1op-ddYnBgvXb9ZLXjFLvAN-CZAxxaGpOjPWOGJe5r5263WFWyRe2d0OcWRlNMx82VZtrRlvNR&currency=USD"></script>
+<script>
+    // Render the PayPal button into #paypal-button-container
+    paypal.Buttons({
+    style: {
+        color: 'blue',
+        shape: 'rect',
+        label: 'pay',
+        height: 40
+    },
+    onClick: function (data, actions) {
+        // Validation
+        var fname = $("[name='fname']").val();
+        
+        var lname = $("[name='lastname']").val();
+        var email = $("[name=email]").val();
+        var phonenumber = $("[name=phonenumber]").val();
+        var address = $("[name=address]").val();
+        var city = $("[name=city]").val();
+        var country = $("[name=country]").val();
+        var state = $("[name=state]").val();
+        var token = $("[name='csrfmiddlewaretoken']").val();
+
+        // Check values are not null
+        if (fname == "" || lname == "" || email == "" || address == "" || phonenumber == "" || city == "" || country == "" || state == "") {
+            swal("Alert!", "All fields are mandatory!", "error");
+            return false;
+        } else {
+            return true;
+        }
+    },
+    // Call your server to set up the transaction
+    createOrder: function (data, actions) {
+        return actions.order.create({
+            purchase_units: [{
+                amount: {
+                    value: '{{grand}}'
+                }
+            }]
+        });
+    },
+    // Call your server to finalize the transaction
+    onApprove: function (data, actions) {
+        return actions.order.capture().then(function (orderData) {
+            // Capture form data
+            var fname = $("[name='fname']").val();
+            var lname = $("[name='lastname']").val();
+            var email = $("[name=email]").val();
+            var phonenumber = $("[name=phonenumber]").val();
+            var address = $("[name=address]").val();
+            var city = $("[name=city]").val();
+            var country = $("[name=country]").val();
+            var state = $("[name=state]").val();
+            var token = $("[name='csrfmiddlewaretoken']").val();
+
+            
+
+            // Prepare data for AJAX request
+            var requestData = {
+                "fname": fname,
+                'lastname': lname,
+                "email": email,
+                "phonenumber": phonenumber,
+                "address": address,
+                "city": city,
+                "country": country,
+                "state": state,
+                "paymentmode": "Paid by paypal",
+                "payment_id": orderData.id,
+                "csrfmiddlewaretoken": token
+            };
+            
+
+            // Make an AJAX request to the server
+            $.ajax({
+                method: "POST",
+                url: "/placeorder",
+                data: requestData,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", token);
+                },
+                success: function (response) {
+    console.log('Server Response:', response);
+
+    if (response && response.status) {
+        swal("Congratulations!", response.status, "success").then((value) => {
+            window.location.href = '/my_orders';
+        });
+    } else {
+        swal("Congratulations!", "Order placed successfully.", "success").then((value) => {
+            window.location.href = '/my_orders';
+        });
+    }
+}
+
+            });
+        });
+    }
+}).render('#paypal-button-container');
+
+           
+</script>
+
+{% endblock scripts %}

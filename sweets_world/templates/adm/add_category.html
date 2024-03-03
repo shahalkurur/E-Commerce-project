@@ -1,0 +1,17 @@
+{% extends 'adm/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="col-md-6">
+    <form  method="POST"> <!--didnt put action="" the form wll submit to same url  -->
+        {% csrf_token %}
+    <label  class="form-label" >Category Name</label>
+    <input class="form-control" type="text" name="name">
+    <label for="formFile" class="form-label">Category image</label>
+    <input class="form-control" type="file" name="image"><br>
+     <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+  
+
+{% endblock %}

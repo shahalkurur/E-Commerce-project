@@ -1,0 +1,376 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.84.0">
+    <title>Dashboard Template · Bootstrap v5.0</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/dashboard/">
+
+    
+
+    <!-- Bootstrap core CSS -->
+   <link href="{% static 'admn/bootstrap.min.css' %}" rel="stylesheet">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+
+    
+    <!-- Custom styles for this template -->
+    <link href="{% static 'admn/dashboard.css' %}" rel="stylesheet">
+  </head>
+  <body>
+    
+<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+  <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Company name</a>
+  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+  <div class="navbar-nav">
+    <div class="nav-item text-nowrap">
+      <small class="title text-muted">welcome..{{ user.email }}</small>
+
+      <a class="nav-link px-3" href="{% url 'logout_user' %}">Sign out</a>
+    </div>
+  </div>
+</header>
+
+<div class="container-fluid">
+  <div class="row">
+    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+      <div class="position-sticky pt-3">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'admin_dsh' %}">
+              <span data-feather="home"></span>
+              Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'manage_orders' %}">
+              <span data-feather="file"></span>
+              Orders
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'manage_category' %}">
+              <span data-feather="shopping-cart"></span>
+              Category
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'manage_products' %}">
+              <span data-feather="shopping-cart"></span>
+              Products
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'manage_user' %}">
+              <span data-feather="users"></span>
+              Customers
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'manage_coupens' %}">
+              <span data-feather="file"></span>
+              Coupens
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="bar-chart-2"></span>
+              Reports
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'manage_offer' %}">
+              <span data-feather="gift"></span>
+              Offers
+            </a>
+          </li>
+        </ul>
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>Saved reports</span>
+          <a class="link-secondary" href="#" aria-label="Add a new report">
+            <span data-feather="plus-circle"></span>
+          </a>
+        </h6>
+        <ul class="nav flex-column mb-2">
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Current month
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Last quarter
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Social engagement
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Year-end sale
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Dashboard</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+          <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+            <span data-feather="calendar"></span>
+            This week
+          </button>
+        </div>
+      </div>
+
+      
+        {% block content %}
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
+        <!-- Fengyuan Chen's Datepicker -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.css" integrity="sha256-b88RdwbRJEzRx95nCuuva+hO5ExvXXnpX+78h8DjyOE=" crossorigin="anonymous" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.js" integrity="sha256-/7FLTdzP6CfC1VBAj/rsp3Rinuuu9leMRGd354hvk0k=" crossorigin="anonymous"></script>
+   
+        
+        <!-- DAY SALES -->
+        <div class="row">
+          <!-- Day Sales Report -->
+          <div class="col-md-4 border rounded p-3">
+              <h5>Day Sales Report</h5>
+              <form method="post" action="{% url 'sales_report' %}">
+                  {% csrf_token %}
+                  {{ form.as_p }}
+                  <button class="btn btn-secondary btn-outline" type="submit">Get</button>
+              </form>
+              {% if selected_date %}
+                  <p>Sales Data of Selected Date: {{ selected_date }}</p>
+                  <table class="table table-hover-bordered border rounded">
+                      <thead>
+                          <tr class="table-info">
+                              <td>Total Orders</td>
+                              <td>Total Amount</td>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr>
+                              <td>{{ t_order }}</td>
+                              <td>{{ t_amount }}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              {% endif %}
+              <br>
+          </div>
+      
+          <!-- Monthly Sales Report -->
+          <div class="col-md-4 border rounded p-3">
+              <h5>Monthly Sales Report</h5>
+              <form method="post" action="{% url 'monthly_sales' %}">
+                  {% csrf_token %}
+                  <div class="form-group">
+                      <label for="month">Select a Month:</label>
+                      <select id="month" class="form-control" name="month">
+                          <option selected disabled>Choose a month</option>
+                          <option value="1" > January</option>
+                           <option value="2"  > February</option>
+                           <option value="3"  > March</option>
+                           <option value="4"  > April</option>
+                           <option value="5"  > May</option>
+                           <option value="6"  > June</option>
+                          <option value="7"  > July</option>
+                          <option value="8"  > August</option>
+                          <option value="9"  > September</option>
+                          <option value="10"  > October</option>
+                          <option value="11"  > November</option>
+                          <option value="12"  > December</option>
+                          
+                      </select>
+                  </div>
+                  <br>
+                  <button type="submit" class="btn btn-secondary">Submit</button>
+              </form>
+              {% if month %}
+                  <p>Sales Data of Selected Month: {{ month }}</p>
+                  <table class="table table-hover-bordered border rounded">
+                      <thead>
+                          <tr class="table-info">
+                              <td>Total Orders</td>
+                              <td>Total Amount</td>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr>
+                              <td>{{ t_order }}</td>
+                              <td>{{ t_amount }}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              {% endif %}
+          </div>
+      
+          <!-- Yearly Sales Report -->
+          <div class="col-md-4 border rounded p-3">
+              <h5>Yearly Sales Report</h5>
+              <form method="post" action="{% url 'year_sales' %}">
+                  {% csrf_token %}
+                  <div class="form-group">
+                      <label for="date-dropdown">Select a Year:</label>
+                      <select id="date-dropdown" name="selected_year" class="form-control">
+                          <!-- Populate years dynamically if needed -->
+                          {% for year in years %}
+                              <option value="{{ year }}">{{ year }}</option>
+                          {% endfor %}
+                      </select>
+                  </div>
+                  <br>
+                  <button type="submit" class="btn btn-secondary">Submit</button>
+              </form>
+              {% if year %}
+                  <p>Sales Data of Selected Year: {{ year }}</p>
+                  <table class="table table-hover-bordered border rounded ">
+                      <thead>
+                          <tr class="table-info">
+                              <td>Total Orders</td>
+                              <td>Total Amount</td>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr>
+                              <td>{{ t_order }}</td>
+                              <td>{{ t_amount }}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              {% endif %}
+          </div>
+        </div>
+      
+      
+      <!-- Sale Report -->
+      <div class="col-md-4 border rounded p-3">
+      
+          <h5>Sale Report</h5>
+          <form method="post" action="{% url 'period_of_sale' %}">
+              {% csrf_token %}
+              <div class="report-bar">
+                  <div class="date-selectors row">
+                      <div class="date-selector col-md-6 row">
+                          <label for="fromDate">From:</label>
+                          <input type="date" id="fromDate" name="from_date" class="form-control" value="{{from_date}}">
+                      </div>
+                      <div class="date-selector col-md-6 row" style="margin-left: 10px;">
+                          <label for="toDate">To:</label>
+                          <input type="date" id="toDate" name="to_date" class="form-control" value="{{to_date}}">
+                      </div>
+                  </div>
+                  <br>
+                  <button type="submit" class="btn btn-secondary">Get Data</button>
+              </div>
+          </form>
+          {% if from_date %}
+                  <p>sales data of Period :<b>({{from_date}})--({{to_date}})</b></p>
+                  <table class="table table-hover-bordered border rounded ">
+                      <thead>
+                          <tr class="table-info">
+                              <td>Total Orders</td>
+                              <td>Total Amount</td>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr>
+                              <td>{{ t_order }}</td>
+                              <td>{{ t_amount }}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              {% endif %}
+            
+          </div>
+        </div>
+          
+      
+
+    
+      
+
+ 
+      
+    
+  
+    
+
+    
+
+
+    
+  <!--  SCRIPT FOR YEAR SELECTION OF YEAR SALES -->
+  
+  <script>
+    let dateDropdown = document.getElementById('date-dropdown'); 
+         
+    let currentYear = new Date().getFullYear();    
+    let earliestYear = 2010;     
+    while (currentYear >= earliestYear) {      
+      let dateOption = document.createElement('option');          
+      dateOption.text = currentYear;      
+      dateOption.value = currentYear;        
+      dateDropdown.add(dateOption);      
+      currentYear -= 1;    
+    }
+  </script>     
+    
+        
+        {% endblock %}
+      
+    </main>
+  </div>
+</div>
+
+
+<script src="{% static 'admn/bootstrap.bundle.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+<script src="{% static 'admn/dashboard.js' %}"></script>
+{%if messages%}
+{%for message in messages%}
+<script>alert('{{message}}')</script>
+{%endfor%}
+{%endif%}
+</body>
+</html>

@@ -1,0 +1,74 @@
+{% extends 'index_base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+
+<div class="container">
+	<div class="row">
+	{% include 'cart/sidebar_dboard.html' %}
+	<main class="col-md-9">
+		<article class="card">
+		<header class="card-header">
+			<strong class="d-inline-block mr-3">Logged in as : {{user.username}}</strong>
+		</header>
+		<div class="card-body">
+			<div class="row"> 
+				
+				<div class="col-md-12">
+					<table class="table table-hover">
+						<thead>
+						  <tr>
+							
+							<th >Order Date</th>
+							<th >Tracking No</th>
+							<th >Total Price</th>
+							<th >Order Status</th>
+							<th >View/Cancel Order</th>
+							<th >invo</th>
+							
+
+						  </tr>
+						</thead>
+						<tbody>
+							{% for item in orders%}
+						  <tr >
+							
+							<td>{{item.created_at}}</td>
+							<td>{{item.tracking_no}}</td>
+							<td>{{item.total_price}}</td>
+							<td>{{item.status}}</td>
+							<td><a href="{% url 'order_details' item.tracking_no %}" class="btn btn-primary">View</a>
+								{% if item.status != 'cancel' and item.status != 'Refund' %}
+								<a href="{% url 'cancel_order' item.id %}" class="btn btn-danger">cancel</a>
+								{% endif %}
+							</td>
+							<td>
+								{% if item.status == 'Delivered' or item.status == 'completed' %}
+								
+								<a href="{% url 'generatepdf' item.id %}" class="btn btn-secondary ">Invoice</a>
+							    
+							{% endif %}
+							</td>
+							</tr>
+							{% endfor %}
+						  
+						  
+						</tbody>
+					  </table>
+					
+				</div>	
+			</div> <!-- row.// -->
+		</div> <!-- card-body .// -->
+		 <!-- table-responsive .end// -->
+		</article> <!-- order-group.// --> 
+	</main>
+</div> <!-- row.// -->
+</div>
+
+
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+
+{% endblock %}

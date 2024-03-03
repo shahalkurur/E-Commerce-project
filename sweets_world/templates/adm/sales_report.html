@@ -1,0 +1,33 @@
+{% extends 'adm/base.html' %}
+{% load static %}
+{% block content %}
+
+
+<h1>Daily Sales Report - {{ selected_date }}</h1>
+
+  <p>Total Sales: ${{ total_sales }}</p>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>User</th>
+        <th>Total Price</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+        <tr>
+          <td>{{ order.id }}</td>
+          <td>{{ order.user.username }}</td>
+          <td>${{ order.total_price }}</td>
+          <td>{{ order.status }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  
+
+{% endblock %}

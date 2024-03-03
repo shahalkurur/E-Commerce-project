@@ -1,0 +1,367 @@
+{% extends 'index_base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section-content padding-y bg">
+    <div class="container">
+        <!-- COMPONENT 1 -->
+        <form id="orderForm" action="{% url 'placeorder' %}" method="POST">
+            {% csrf_token %}
+            <div class="row">
+                <aside class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-tittle mb-4">Billing Address</h4>
+                            <h6>Current Address</h6>
+                            {% for i in addrs %}
+                            <div class="address-item">
+                                <input type="radio" name="address" id="address_{{ forloop.counter }}" value="{{ i.id }}">
+                                <label for="address_{{ forloop.counter }}">{{ i.first_name }} {{ i.last_name }} 
+                                     {{ i.addressline1 }} - {{ i.phoneNumber }} - {{ i.state }}</label>
+                            </div>
+                            {% endfor %}
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addressModal">New Address</button>
+
+                            <!-- Address Modal -->
+                            
+                        </div>
+                    </div>
+                </aside>
+                <aside class="col-lg-6">
+                    
+                    <div class="card">
+                        <table class="table table-borderless table-shopping-cart">
+                            <thead class="text-muted">
+                                <tr class="small text-uppercase">
+                                    <th scope="col">Product</th>
+                                    <th scope="col" width="120">Quantity</th>
+                                    <th scope="col" width="120">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart_items %}
+                                <tr>
+                                    <td>
+                                        <figure class="itemside align-items-center">
+                                            <div class="aside"><img src="{{ item.product.prod_image.url }}" class="img-sm"></div>
+                                            <figcaption class="info">
+                                                <a href="/product_detail/{{ item.product.id }}" class="title text-dark">{{ item.product.prod_name }}</a>
+                                                <p class="text-muted small">{{ item.product.prod_name }}<br>{{ item.product.description }}</p>
+                                            </figcaption>
+                                        </figure>
+                                    </td>
+                                    <td>
+                                        <div class="col product-data">
+                                            <div class="input-group input-spinner product-data">
+                                                <label type="text" class="qty-input quantity-element">{{ item.quandity }}</label>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="price-wrap">
+                                            <var class="price">Rs.{{ item.sub_total|stringformat:'d' }}</var>
+                                            <small class="text-muted">Rs. {{ item.product.price|stringformat:'d' }}/Kg </small>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="container mt-4">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <dl class="dlist-align mb-4">
+                                        <dt style="margin-left: 20px;">Total price with tax:</dt> 
+                                        {% if coupen %}
+                                        <dd style="text-align: end;" class="mr-3 text-muted">Rs:<del style="color: red;"> {{grand}}</del></dd>
+                                        {% else %}
+                                        <dd style="text-align: end;" class="mr-3 text">Rs:<span > {{grand}}</span></dd>
+                                        {% endif %}
+                                    </dl>
+                                </div>
+                                <div class="col-md-12">
+                                    {% if coupen %}
+                                    <dl class="dlist-align">
+                                        <dt style="margin-left: 20px;">Price to be Paid:</dt>
+                                        <dd style="text-align: end;" class="mr-3 text-dark">Rs: {{ amount }}</dd>
+                                    </dl>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            {% if messages %}
+                            {% for message in messages %}
+                            <p>{{message}}</p>
+                            {% endfor %}
+                            {% endif %}
+                            {% if flag == 'True' %}
+                            <input type="hidden" value="wallet" name="paymentmode">
+                            <div class="alert alert-success  items-center" role="alert">
+                                You have ₹ {{wallet.my_wallet}} in Your Wallet..! to Redeem 
+                                <button type="submit" class="text-success btn" >Click Here</button>
+                                <input type="hidden" name="wallet" value="wallet">
+                                <input type="hidden" value="{{amount}}" name="wallet_pay">
+                            </div>
+                            {% else %}
+                            <input type="hidden" value="COD" name="paymentmode">
+                            {% endif %}
+                            <input type="hidden" value="{{grand}}" name="total">
+                            <button type="submit" class="btn btn-secondary btn-block">COD| Place Order</button><br>
+                            <button type="submit" class="btn btn-secondary btn-block razor_pay">Razor Pay</button><br>
+                            <div id="paypal-button-container"></div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </form>
+        <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="addressModalLabel">Add Address</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="address-form" action="{% url 'add_address' %}" method="POST">
+                                                {% csrf_token %}-------------------
+                                                <div class="form-group">
+                                                    <label for="first_name">First Name</label>
+                                                    <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter First Name">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="last_name">Last Name</label>
+                                                    <input type="text" class="form-control" id="last_name" placeholder="Enter Last Name">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="addressLine">Address Line</label>
+                                                    <input type="text" class="form-control"  id="addressLine" placeholder="Enter Address">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="phoneNumber">Phone Number</label>
+                                                    <input type="text" class="form-control" id="phoneNumber" placeholder="Enter Phone Number">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="state">State</label>
+                                                    <input type="text" class="form-control" id="state" placeholder="Enter State">
+                                                </div>
+                                                <button type="submit" name="formadres" class="btn btn-primary ">Save Address</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %} 
+ <script src="https://checkout.razorpay.com/v1/checkout.js"></script> 
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script src="https://www.paypal.com/sdk/js?client-id=AeDTbc1op-ddYnBgvXb9ZLXjFLvAN-CZAxxaGpOjPWOGJe5r5263WFWyRe2d0OcWRlNMx82VZtrRlvNR&currency=USD"></script>
+<script>
+    // Render the PayPal button into #paypal-button-container
+    paypal.Buttons({
+    style: {
+        color: 'blue',
+        shape: 'rect',
+        label: 'pay',
+        height: 40
+    },
+    onClick: function (data, actions) {
+        // Validation
+        var fname = $("[name='first_name']").val();
+        
+        var lname = $("[name='lastname']").val();
+        var email = $("[name=email]").val();
+        var phonenumber = $("[name=phonenumber]").val();
+        var address = $("[name=address]").val();
+        var city = $("[name=city]").val();
+        var country = $("[name=country]").val();
+        var state = $("[name=state]").val();
+        var token = $("[name='csrfmiddlewaretoken']").val();
+
+        // Check values are not null
+        if (fname == "" || lname == "" || email == "" || address == "" || phonenumber == "" || city == "" || country == "" || state == "") {
+            swal("Alert!", "All fields are mandatory!", "error");
+            return false;
+        } else {
+            return true;
+        }
+    },
+    // Call your server to set up the transaction
+    createOrder: function (data, actions) {
+        return actions.order.create({
+            purchase_units: [{
+                amount: {
+                    value: '{{grand}}'
+                }
+            }]
+        });
+    },
+    // Call your server to finalize the transaction
+    onApprove: function (data, actions) {
+        return actions.order.capture().then(function (orderData) {
+            // Capture form data
+            var fname = $("[name='first_name']").val();
+            var lname = $("[name='lastname']").val();
+            var email = $("[name=email]").val();
+            var phonenumber = $("[name=phonenumber]").val();
+            var address = $("[name=address]").val();
+            var city = $("[name=city]").val();
+            var country = $("[name=country]").val();
+            var state = $("[name=state]").val();
+            var token = $("[name='csrfmiddlewaretoken']").val();
+
+            
+
+            // Prepare data for AJAX request
+            var requestData = {
+                "first_name": fname,
+                'lastname': lname,
+                "email": email,
+                "phonenumber": phonenumber,
+                "address": address,
+                "city": city,
+                "country": country,
+                "state": state,
+                "paymentmode": "Paid by paypal",
+                "payment_id": orderData.id,
+                "csrfmiddlewaretoken": token
+            };
+            
+
+            // Make an AJAX request to the server
+            $.ajax({
+                method: "POST",
+                url: "/placeorder",
+                data: requestData,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", token);
+                },
+                success: function (response) {
+    console.log('Server Response:', response);
+
+    if (response && response.status) {
+        swal("Congratulations!", response.status, "success").then((value) => {
+            window.location.href = '/order_success';
+        });
+    } else {
+        swal("Congratulations!", "Order placed successfully.", "success").then((value) => {
+            window.location.href = '/order_success';
+        });
+    }
+}
+
+            });
+        });
+    }
+}).render('#paypal-button-container');
+
+           
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#address-form').on('submit', function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Collect the form data
+            var formData = $(this).serialize();
+
+            // Define the URL where you want to send the form data
+            var url = '{% url "add_address" %}';
+
+            // Send an AJAX POST request
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: formData,
+                success: function (data) {
+                    // Handle the success response here if needed
+                    console.log('Form submitted successfully');
+                    
+                    // Reload the page after a successful submission
+                    location.reload();
+                },
+                error: function (error) {
+                    // Handle any errors here if needed
+                    console.error('Form submission error', error);
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+
+<!-- <script>
+    $(document).ready(function () {
+        $('#address-form').on('submit', function (e) {
+            // Form validation
+            var isValid = true;
+
+            var name = $('#first_name').val();
+            var email = $('#email').val();
+            var phone = $('#phoneNumber').val();
+            var address = $('#addressLine').val();
+            var pin = $('#pin').val();
+
+            if (name.trim().length <= 3 || /\d/.test(name)) {
+                alert('Full Name should have more than 3 characters and should not contain numbers.');
+                isValid = false;
+            }
+
+            if (email.trim() === '' || !validateEmail(email)) {
+                alert('Please enter a valid email address.');
+                isValid = false;
+            }
+
+            if (phone.trim() === '' || !validatePhoneNumber(phone)) {
+                alert('Phone number should have 10 digits and no other characters.');
+                isValid = false;
+            }
+
+            if (address.trim().length <= 5) {
+                alert('Address should have more than 5 characters.');
+                isValid = false;
+            }
+
+            if (!validatePinCode(pin)) {
+                alert('Pin code should have 6 digits and no other characters.');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault(); // Prevent form submission if validation fails
+            }
+        });
+
+        // Function to validate email
+        function validateEmail(email) {
+            var emailRegex = /^[a-zA-Z0-9._-]+@gmail\.com$/;
+            return emailRegex.test(email);
+        }
+
+        // Function to validate phone number
+        function validatePhoneNumber(phone) {
+            return /^[0-9]{10}$/.test(phone);
+        }
+
+        // Function to validate pin code
+        function validatePinCode(pin) {
+            return /^[0-9]{6}$/.test(pin);
+        }
+    });
+</script> -->
+
+
+
+{% endblock scripts %}
+

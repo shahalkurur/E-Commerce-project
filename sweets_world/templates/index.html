@@ -1,0 +1,46 @@
+{% extends 'index_base.html' %}
+{% load static %}
+{% block content %}
+<!-- ========================= SECTION MAIN ========================= -->
+<section class="section-intro padding-y-sm">
+	<div class="container">
+	
+	<div class="intro-banner-wrap">
+		<img src="{% static 'images/banners/banner-1.jpg' %}" class="img-fluid rounded ">
+	</div>
+	
+	</div> <!-- container //  -->
+	</section>
+			
+	<!-- ========================= SECTION MAIN END// ========================= -->
+	<section class="section-name padding-y-sm">
+		<div class="container">
+		
+		<header class="section-heading">
+			<!-- <a href="./store.html" class="btn btn-outline-primary float-right">See all</a> -->
+			<h3 class="section-title"> Categories</h3>
+		</header>
+
+		<section class="section-name padding-y-sm">
+			<div class="container">
+		<div class="row">
+{% for cat in Category %}
+
+
+	<div class="col-md-3">
+		<div class="card card-product-grid">
+			
+             <img src="{{ cat.cat_image.url }}" alt="Category Image">
+			<figcaption class="info-wrap">
+				<a href="/cat_by_prod/{{cat.id}}" >{{cat.category_name}}</a>
+				<div class="price mt-1"></div> <!-- price-wrap.// -->
+				<div>{{cat.discription}}</div>
+			</figcaption>
+		</div>
+	</div> 
+
+	{% endfor %}
+</div>
+			</div>
+		
+{% endblock %}

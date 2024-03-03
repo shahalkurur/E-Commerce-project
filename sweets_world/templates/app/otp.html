@@ -1,0 +1,146 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="max-age=604800" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{% load static %}
+<title>GreatKart | One of the Biggest Online Shopping Platform</title>
+
+<link href="images/favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+<!-- jQuery -->
+<script src="{% static 'js/jquery-2.0.0.min.js' %}" type="text/javascript"></script>
+
+<!-- Bootstrap4 files-->
+<script src="{% static 'js/bootstrap.bundle.min.js' %}" type="text/javascript"></script>
+<link href="{% static 'css/bootstrap.css' %}" rel="stylesheet" type="text/css"/>
+
+<!-- Font awesome 5 -->
+<link href="{% static 'fonts/fontawesome/css/all.min.css' %}" type="text/css" rel="stylesheet">
+
+<!-- custom style -->
+<link href="{% static 'css/ui.css' %}" rel="stylesheet" type="text/css"/>
+<link href="{% static 'css/responsive.css' %}" rel="stylesheet" media="only screen and (max-width: 1200px)" />
+
+<!-- custom javascript -->
+<script src="{% static 'js/script.js' %}" type="text/javascript"></script>
+
+<script type="text/javascript">
+/// some script
+
+// jquery ready start
+$(document).ready(function() {
+	// jQuery code
+
+}); 
+// jquery end
+</script>
+
+</head>
+<body>
+
+
+
+	<div class="card">
+		
+<center><strong>CONFRIM YOUR ACCOUNT</strong></center>
+
+<center><p>check the inbox of your email - {{email}} - and enter the otp<p></center>
+
+    <form action="{% url 'otp_verification' %}" method="post">
+		{% csrf_token %}
+		<center>Enter the otp : <input type="text" placeholder="enter the otp" name="otp"></center><br><br>
+	
+		<div id="countdown-timer" style="text-align: center; color: red;">
+			<span id="minutes">01</span>:<span id="seconds">00</span>
+		</div>
+	
+		<div id="otp-expired-message" style="display: none; color: red;">
+			OTP has expired
+		</div>
+	
+		<center><button type="submit">verify</button></center>
+	</form>
+	
+
+</div>
+
+
+
+
+<script>
+  // Function to update the countdown timer
+  // Function to update the countdown timer
+function updateTimer(minutes, seconds) {
+  document.getElementById('minutes').textContent = minutes;
+  document.getElementById('seconds').textContent = seconds < 10 ? '0' + seconds : seconds;
+}
+
+// Countdown timer
+let countdown = 60; // 60 seconds
+let countdownInterval = setInterval(function () {
+  const minutes = Math.floor(countdown / 60);
+  const seconds = countdown % 60;
+  updateTimer(minutes, seconds);
+  countdown--;
+
+  if (countdown < 0) {
+    clearInterval(countdownInterval);
+    // Handle the expiration of the timer here
+    document.getElementById('submit-button').disabled = true; // Disable the submit button
+    document.getElementById('otp').disabled = true; // Disable the OTP input
+    document.getElementById('countdown-timer').style.display = 'none'; // Hide the countdown timer
+    document.getElementById('otp-expired-message').style.display = 'block'; // Show the expired message
+    document.getElementById('otp-resend-button').style.display = 'block'; // Show the "Resend OTP" button
+  }
+}, 1000); // Update every 1 second
+
+document.getElementById('otp-form').addEventListener('submit', function (event) {
+  const otpField = document.getElementById('otp');
+  const otpValue = otpField.value;
+
+  if (otpValue.trim() === '' || isNaN(otpValue) || parseInt(otpValue) < 0) {
+    alert('Please enter a valid OTP.');
+    event.preventDefault(); // Prevent the form from submitting
+  }
+});
+
+</script>
+{%if messages%}
+{%for message in messages%}
+<script>alert('{{message}}')</script>
+{%endfor%}
+{%endif%}
+</body>
+
+</html>
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>otp confirm</title>
+</head>
+
+    <center><strong>CONFRIM YOUR ACCOUNT</strong></center>
+
+<center><p>check the inbox of your email - {{email}} - and enter the otp<p></center>
+
+<body>
+    <form action= "{% url 'otp_verification' %}"  method="post">
+        {% csrf_token %}
+        <center>Enter the otp : <input type="text" placeholder="enter the otp" name="otp"></center><br><br>
+        <center><button type="submit">verify</button></center>
+    </form>
+</body>
+
+
+{%if messages%}
+{%for message in messages%}
+<script>alert('{{message}}')</script>
+{%endfor%}
+{%endif%}
+
+</html> -->

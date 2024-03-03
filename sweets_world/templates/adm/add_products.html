@@ -1,0 +1,26 @@
+{% extends 'adm/base.html' %}
+{% load static %}
+{% block content %}
+<div class="col-md-6">
+    <form  method="POST" enctype="multipart/form-data"> <!--didnt put action="" the form wll submit to same url  -->
+        {% csrf_token %}
+        <select class="form-select" aria-label="Default select example" name="category">
+            <option selected> Select Category</option>
+            {% for cat in Category %}
+             <option name="category" value="{{cat.id}}">{{cat.category_name}}</option>
+             {% endfor %}
+          </select><br>
+     <label  class="form-label" >Product Name</label><br>
+    <input placeholder="Product Name" class="form-control" type="text" name="name"><br>
+    <label for="formFile" class="form-label">Product image</label>
+    
+    <input class="form-control" type="file" name="image" >
+    
+    
+    <input placeholder="price" class="form-control" type="number" name="price" ><br>
+    <input placeholder="stock" class="form-control" type="number" name="stock" ><br>
+    <input placeholder="product discription" class="form-control" type="text" name="discription" ><br>
+     <button type="submit" class="btn btn-primary">Submit</button> 
+    </form>
+{% endblock %}
+ 

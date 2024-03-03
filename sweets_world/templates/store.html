@@ -1,0 +1,226 @@
+{% extends 'index_base.html' %}
+{% load static %}
+{% block content %}
+<!-- ========================= SECTION INTRO END// ========================= -->
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-content padding-y">
+<div class="container">
+
+<div class="row">
+	<aside class="col-md-3">
+		
+<div class="card">
+	<!-- <article class="filter-group">
+		<header class="card-header">
+			<a href="#" data-toggle="collapse" data-target="#collapse_1" aria-expanded="true" class="">
+				<i class="icon-control fa fa-chevron-down"></i>
+				<h6 class="title">Categories</h6>
+			</a>
+		</header>
+		<div class="filter-content collapse show" id="collapse_1" >
+			<div class="card-body">
+				
+				<ul class="list-menu">
+					
+				<li><a href="#">{{item.category_name}}</a></li>
+				
+				</ul>
+
+			</div>  card-body.// 
+		</div>
+	</article>  -->
+	<!-- filter-group  .// -->
+	<!--<article class="filter-group">
+		<header class="card-header">
+			<a href="#" data-toggle="collapse" data-target="#collapse_4" aria-expanded="true" class="">
+				<i class="icon-control fa fa-chevron-down"></i>
+				<h6 class="title">Sizes </h6>
+			</a>
+		</header>
+		
+		
+	</article>  filter-group .// -->
+	
+	<article class="filter-group">
+		<header class="card-header">
+			<a href="#" data-toggle="collapse" data-target="#collapse_3" aria-expanded="true" class="">
+				<i class="icon-control fa fa-chevron-down"></i>
+				<h6 class="title">Price range </h6>
+			</a>
+		</header>
+		<div class="filter-content collapse show" id="collapse_3" >
+			<div class="card-body price">
+				<form action="{% url 'price_filter' %}" method="post">
+					{% csrf_token %}
+					
+					<div class="form-group col-md-12">
+						<label for="category" class="required">Select Categories:</label>
+						<select id="category" name="category" class="form-control" multiple>
+							{% for cat in category %}
+								<option value="{{ cat.id }}">{{ cat.category_name }}</option>
+							{% endfor %}
+						</select>
+					</div>
+				
+				<div class="form-row price">
+					
+					<div class="form-group col-md-6">
+				  <label>Min</label>
+				  <!-- <input class="form-control" placeholder="$0" type="number"> -->
+				  	<select class="mr-2 form-control price_from" name="price_from">
+						
+						<option value="100">100</option>
+						<option value="150">150</option>
+						<option value="200">200</option>
+						<option value="500">500</option>
+						<option value="1000">1000</option>
+					</select>
+				</div>
+				<div class="form-group text-right col-md-6">
+				  <label>Max</label>
+				  	<select class="mr-2 form-control price_to" name="price_to">
+						
+						<option value="150">150</option>
+						<option value="200">200</option>
+						<option value="500">500</option>
+						<option value="1000">1000</option>
+						<option value="2000">2000</option>
+					</select>
+				</div>
+				</div> <!-- form-row.// -->
+				<button type="submit" class="btn btn-block btn-primary button">Apply</button>
+			</form>
+			</div><!-- card-body.// -->
+		</div>
+	</article> <!-- filter-group .// -->
+	
+</div> <!-- card.// -->
+
+	</aside> <!-- col.// -->
+	<main class="col-md-9">
+
+<header class="border-bottom mb-4 pb-3">
+		<div class="form-inline">
+			{% if count %}
+			<span class="mr-md-auto">{{count}} Items found </span>
+			{% else %}
+			<span class="mr-md-auto">No Items found </span>
+			{% endif %}
+			
+		</div>
+</header><!-- sect-heading -->
+<div class="container">
+	<div class="row">
+		{% if Products %}
+		{% for item in Products %}
+		<div class="col-md-3">
+			<figure class="card card-product-grid">
+				<div class="img-wrap"> 
+					
+					<img src="{{ item.prod_image.url }}">
+					
+				</div> <!-- img-wrap.// -->
+				<figcaption class="info-wrap">
+					<div class="card-group">
+						<a href="./product-detail.html" class="title">{{item.prod_name}}</a>
+						<p  style="text-wrap:nowrap; font-size: 12px; color: #726f6f;">{{ item.description }}</p>
+
+						<div class="price-wrap mt-2">
+							<span class="price">₹{{item.price|stringformat:'d'}}/kg</span>
+							{%if item.old_price%}
+							<del class="price-old">{{item.old_price|stringformat:'d'}}</del>
+							{% endif %}
+						</div> <!-- price-wrap.// -->
+					</div>
+					<!-- <a href="#" class="btn btn-block btn-success">Added to cart </a> -->
+				</figcaption>
+			</figure>
+		</div> <!-- col.// -->
+		{% endfor %}
+		  
+		  {% else %}
+		
+     
+         {% for cat in category %}
+	
+			<div class="col-md-4">
+			<div class="card card-product-grid">
+			
+             <img src="{{ cat.cat_image.url }}" alt="Category Image">
+			<figcaption class="info-wrap">
+				<a href="/cat_by_prod/{{cat.id}}" >{{cat.category_name}}</a>
+				<div class="price mt-1"></div>  
+				<div>{{cat.discription}}</div>
+			</figcaption>
+		   </div>
+	      </div>
+		  {% endfor %} 
+		  {% endif %}
+
+
+            
+           
+</div> <!-- row end.// -->
+</div>
+
+<!-- Pagination -->
+<nav class="mt-4" aria-label="Page navigation sample">
+  <!-- <ul class="pagination">
+    {% if Products.has_previous %}
+		     <li class="page-item "><a class="page-link" href="?page={{products.previous_page_number}}">Previous</a></li>
+			 {% endif %}
+				{% for i in Products.paginator.page_range %}
+			  <li class="page-item "><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+			  {% endfor %}
+			  {% if Products.has_next %}
+			  <li class="page-item"><a class="page-link" href="?page={{products.next_page_number}}">Next</a></li>
+			  {% endif %}
+  </ul> -->
+</nav>
+
+	</main> <!-- col.// -->
+
+</div>
+
+
+</div> <!-- container .//  -->
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+<script>
+    $(document).ready(function() {
+        $('#category').select2({
+            multiple: true,
+            placeholder: "Select Categories",
+        });
+    });
+</script>
+<!-- <script>
+	$('.button').click(function (e) {
+        e.preventDefault();
+		var price_from = $(this).closest('.price').find('.price_from').val()
+		var price_to = $(this).closest('.price').find('.price_to').val()
+		var token = $('input[name=csrfmiddlewaretoken]').val(); 
+
+        $.ajax({
+            method: "POST",
+            url: "/price_filter/",
+            data: {
+                'price_from': price_from,
+                'price_to': price_to,
+                csrfmiddlewaretoken: token
+            },
+           
+            success: function (response) {
+                
+
+			}
+            
+            
+        });
+	});
+	
+	 </script> -->
+
+
+{% endblock %}

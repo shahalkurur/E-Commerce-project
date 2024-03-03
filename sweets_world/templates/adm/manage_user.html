@@ -1,0 +1,41 @@
+
+{% extends 'adm/base.html' %}
+{% load static %}
+
+{% block content %}
+
+    
+  
+    <table class="table table-hover-bordered">
+        <thead>
+          <tr class="table-info">
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>Active</th>
+            <th>Block/Unblock</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>{{user.id}}</td>
+            <td>{{user.username}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.mobile}}</td>
+            <td>{{user.is_active}}</td>
+            <td>
+              {% if user.is_active %}
+                <a href="{% url 'block_user' id=user.id %}"><button type="button">Block</button></a>
+              {% else %}
+                <a href="{% url 'unblock_user' id=user.id %}"><button type="button">Unblock</button></a>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+            
+        </tbody>
+    </table>
+    
+{% endblock %}

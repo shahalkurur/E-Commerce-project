@@ -1,0 +1,87 @@
+{% extends 'index_base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+
+<div class="container">
+	<div class="row">
+	{% include 'cart/sidebar_dboard.html' %}
+	<main class="col-md-9">
+		<article class="card">
+		<header class="card-header">
+			<strong class="d-inline-block mr-3">Edit profile:</strong>
+		</header>
+		<div class="card-body">
+			<!-- Profile Picture -->
+			<!-- Uncomment the following lines if you want to include a profile picture -->
+			<!--
+			<div class="text-right">
+				<img src="" alt="Profile Picture" width="100" style="border-radius: 50px;">
+			</div>
+			-->
+		
+			<div class="row">
+				<div class="col-md-12">
+					<form action="{% url 'edit_profile' %}" method="POST" enctype="multipart/form-data">
+						{% csrf_token %}
+						<div class="form-row">
+							<div class="form-group col-md-6">
+								<label for="first_name">First Name</label>
+								{{user_form.first_name}}
+							</div>
+							<div class="form-group col-md-6">
+								<label for="last_name">Last Name</label>
+								{{user_form.last_name}}
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group col-md-6">
+								<label for="mobile">Phone Number</label>
+								{{user_form.mobile}}
+							</div>
+							<div class="form-group col-md-6">
+								<label for="profile_pic">Profile Picture</label>
+								{{profile_form.profile_pic}}
+							</div>
+						</div>
+		
+						<div class="form-group">
+							<label for="address">Address</label>
+							{{profile_form.address}}
+						</div>
+		
+						<div class="form-row">
+							<div class="form-group col-md-4">
+								<label for="country">Country</label>
+								{{profile_form.country}}
+							</div>
+							<div class="form-group col-md-4">
+								<label for="state">State</label>
+								{{profile_form.state}}
+							</div>
+							<div class="form-group col-md-4">
+								<label for="city">City</label>
+								{{profile_form.city}}
+							</div>
+						</div>
+		
+						<button type="submit" class="btn btn-primary">Save</button>
+					</form>
+				</div>
+			</div> <!-- row.// -->
+		</div> <!-- card-body ./ -->
+		 <!-- card-body .// -->
+		 
+		 <!-- table-responsive .end// -->
+		</article> <!-- order-group.// --> 
+	</main>
+</div> <!-- row.// -->
+</div>
+
+
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+
+{% endblock %}

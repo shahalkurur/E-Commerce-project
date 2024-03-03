@@ -1,0 +1,98 @@
+{% extends 'index_base.html' %}
+{% load static %}
+{% block content %}
+<section class="section-content padding-y bg">
+<div class="container ">
+    <div class="d-flex justify-content-center  ">
+<div class="row">
+    {% if wishlist %}
+    <div class="card">
+
+<table class="table table-borderless table-shopping-cart">
+    <thead class="text-muted">
+    <tr class="small text-uppercase">
+      <th scope="col">Product</th>
+      <th scope="col">Qty</th>
+      <th scope="col" width="120">Price</th>
+      <th scope="col" class="text-right" width="200"> </th>
+    </tr>
+    </thead>
+    <tbody>
+       
+        {% for item in wishlist %} 
+    <tr class="wishcart">
+        {% csrf_token %}
+        <td>
+            <figure class="itemside align-items-center">
+                <input type="hidden" class="prod_id" value="{{item.product.id}}">
+                <div class="aside"><img src="{{item.product.prod_image.url}}" class="img-sm"></div>
+                <figcaption class="info">
+                    <a href="/product_detail/{{item.product.id}}" class="title text-dark">{{item.product.prod_name}}</a>
+                    <p class="text-muted small">{{item.product.prod_name}}<br>{{item.product.description}} </p>
+                </figcaption>
+            </figure>
+        </td>
+        <td>
+            <div class="input-group-prepend">
+                <input type="text" class="col-sm-3 form-control qty-input " value="1">
+
+            </div>
+            
+        </td>
+        
+        <td> 
+            <div class="price-wrap "> 
+                <p class=" text-muted ">Rs. {{ item.product.price|stringformat:'d' }}/Kg</p> 
+                <!-- <small class="text-muted">Rs. {{ item.product.price|stringformat:'d' }}/Kg </small>  -->
+            </div> <!-- price-wrap .// -->
+        </td>
+        
+        <td class="text-right"> 
+        <a href="/delete_wishlist/{{item.product.id}}" class="btn btn-danger wishlist_remove"><i class="fa fa-trash"> </i>Remove</a>
+        </td>
+        <br>
+        <td>
+        <a href="" class="btn btn-success addtocart" data-prod-id="{{ prod.id }}">Add to cart
+            <i class="fas fa-shopping-cart"></i></a>
+        </td>
+        
+    {% endfor %}
+    </tbody>
+    </table>
+    {% else %}
+</div>
+<h3>No Wishlist items</h3>
+{% endif %}
+</div>
+</div>
+</div>
+</section>
+<script>
+
+// add to cart
+$('.addtocart').click(function (e) {
+        e.preventDefault();
+        var prod_id = $(this).closest('.wishcart').find('.prod_id').val();
+        var prod_qty = $(this).closest('.wishcart').find('.qty-input').val();
+        var token = $('input[name=csrfmiddlewaretoken]').val();
+
+        console.log('prod_id:', prod_id);
+
+        $.ajax({
+            method: "POST",
+            url: "/category/add_cart/",
+            data: {
+                'prod_id': prod_id,
+                'prod_qty': prod_qty,
+                csrfmiddlewaretoken: token
+            },
+            success: function (response) {
+                window.location.href = "http://127.0.0.1:8000/category/cart/";// easy way to laod to specified page after action
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+            }
+        });
+    });
+</script>
+{% endblock %}

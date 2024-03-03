@@ -1,0 +1,52 @@
+{% extends 'index_base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+
+<div class="container">
+	<div class="row">
+	{% include 'cart/sidebar_dboard.html' %}
+	<main class="col-md-9">
+		<article class="card">
+		<header class="card-header">
+			<strong class="d-inline-block mr-3">Logged in as :</strong>
+			<span>{{ user.username }}</span>
+		</header>
+		<div class="card-body">
+			<div class="row"> 
+				<div class="col-md-6">
+					<div class="card"  style="text-align: center;">
+						<div class="card-body">
+							<h5 class="card-tittle">Total Orders</h5>
+							<h4>{{ord_count}}</h4>
+							<br>
+							<p>You have <span class="text-success">{{wallet.my_wallet}} ₹</span> in your wallet </p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="card c" style="text-align: center;">
+						<div class="card-body">
+							<img src="https://www.w3schools.com/howto/img_avatar.png"  width="50" height="50" style="border-radius: 50%;">
+							<p>{{ user.email}}</p>
+
+						</div>
+					</div>
+				</div>
+				
+				
+			</div> <!-- row.// -->
+		</div> <!-- card-body .// -->
+		 <!-- table-responsive .end// -->
+		</article> <!-- order-group.// --> 
+	</main>
+</div> <!-- row.// -->
+</div>
+
+
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+
+{% endblock %}
