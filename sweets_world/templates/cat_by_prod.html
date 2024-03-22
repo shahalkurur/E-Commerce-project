@@ -3,13 +3,7 @@
 {% block content %}
 <!-- ========================= SECTION MAIN ========================= -->
 <section class="section-intro padding-y-sm">
-	<!-- <div class="container">
 	
-	<div class="intro-banner-wrap">
-		<img src="{% static 'images/banners/banner-1.jpg' %}" class="img-fluid rounded ">
-	</div>
-	
-	</div> container //  -->
 	</section>
 			
 	<!-- ========================= SECTION MAIN END// ========================= -->
@@ -18,6 +12,30 @@
 		
 		<header class="section-heading">
 			<!-- <a href="./store.html" class="btn btn-outline-primary float-right">See all</a> -->
+			<div class=" d-flex align-items-center mt-3 mt-md-0 float-right" id="sorted_i" data-cat-id="{{ cat_id }}">
+				
+
+				<label for="sort">Sort By:</label>
+				<!-- <select name="sort" id="sort">tried with this ajax code but not fetching data to page
+					<option value="Position">Relevance</option>
+					<option value="Name Ascen">Name, A to Z</option>
+					<option value="Name Decen">Name, Z to A</option>
+					<option value="Price Ascen">Price low to high</option>
+					<option value="Price Decen">Price high to low</option>
+				</select> -->
+				<form action="" method="post">
+					{% csrf_token %}
+				<select class="form-select d-flex align-items-center mt-3 mt-md-0 float-left"  name="sort" aria-label="Default select example">
+					<option selected>select type</option>
+					
+					<option value="Name Ascen">Name, A to Z</option>
+					<option value="Name Decen">Name, Z to A</option>
+					<option value="Price Ascen">Price low to high</option>
+					<option value="Price Decen">Price high to low</option>
+				  </select>
+				  <button class="ml-1 float-right" type="submit">go</button>
+				</form>
+			</div>
 			<h3 class="section-title">products</h3>
 		</header>
 
@@ -41,8 +59,7 @@
           {% else %}
             <p class="text-capitalize" style="color: #726f6f;">₹ {{prod.price|floatformat:0}}/Kg</p>
           {% endif %}
-			<!-- <h6 class="float-left fs-8" style="color: #726f6f;">{{ prod.price|floatformat:0 }}/Kg</h6>
-			<h6 class="float-right" style="color: #726f6f;">{{ prod.dis_price|floatformat:0 }}/Kg</h6> -->
+			
 		</figcaption>
 	</div></a>
 </div>
@@ -65,5 +82,30 @@
 			  {% endif %}
 			</ul>
 		  </nav>
-		
+	
+<script>
+	$(document).ready(function() {
+    // Add event listener for changes in the sorting dropdown
+    $("#sort").change(function() {
+        // Get the selected sorting option value
+        var sortBy = $(this).val();
+		var catId = $("#sorted_id").data("cat-id");
+
+        // Make an AJAX request to fetch sorted products
+        $.ajax({
+            method: "GET",
+            url: "/cat_by_prod/" + catId + "?sort=" + sortBy,  // Replace 'id' with the actual category ID
+            success: function(response) {
+				console.log(response);
+                // Update the content of the sorted-products-container with the received products
+                $("#sorted-products-container").html(response);
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+            }
+        });
+    });
+});
+
+</script>
 {% endblock %}

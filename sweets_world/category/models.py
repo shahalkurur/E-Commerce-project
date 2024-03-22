@@ -52,20 +52,27 @@ class Cart(models.Model):
 
       def sub_total(self):
           return self.product.price*self.quandity
-
+class Address(models.Model):
+    user=models.ForeignKey(CustomUser,on_delete=models.CASCADE)
+    first_name=models.CharField(max_length=20,blank=True,null=True)
+    last_name=models.CharField(max_length=20,blank=True,null=True)
+    email = models.EmailField( unique=False,blank=True,null=True)
+    phone_number = models.CharField(max_length=15,blank=True,null=True)
+    addressline1 = models.CharField(max_length=255,blank=True,null=True)
+    addressline2 = models.CharField(max_length=255,blank=True)
+    country = models.CharField(max_length=20,blank=True,null=True)
+    state = models.CharField(max_length=20,blank=True,null=True)
+    pin = models.CharField(max_length=20,blank=True,null=True)
+    is_deleted = models.BooleanField(default=False)
+    flag = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return self.user.first_name
+    
 class Order(models.Model):
       user=models.ForeignKey(CustomUser,on_delete=models.CASCADE)
-      f_name=models.CharField(max_length=150,null=False)
-      l_name=models.CharField(max_length=150,null=False)
-      email=models.CharField(max_length=150,null=False)
-      address=models.CharField(max_length=150,null=False)
-      mobile=models.CharField(max_length=30,null=False)
-      country=models.CharField(max_length=150,null=False)
-      city=models.CharField(max_length=150,null=False)
-      state=models.CharField(max_length=150,null=False)
-      pincode=models.CharField(max_length=150,null=False)
+      address=models.ForeignKey(Address,on_delete=models.CASCADE)
       total_price=models.FloatField(null=False)
-
       payment_mode=models.CharField(max_length=150,null=False)
       payment_id=models.CharField(max_length=150,null=True)
       orderstatuses=(
@@ -84,21 +91,7 @@ class Order(models.Model):
       def __str__(self):
            return '{}-{}'.format(self.id,self.tracking_no)
 
-class Address(models.Model):
-    user=models.ForeignKey(CustomUser,on_delete=models.CASCADE)
-    first_name=models.CharField(max_length=20,blank=True,null=True)
-    last_name=models.CharField(max_length=20,blank=True,null=True)
-    email = models.EmailField( unique=False,blank=True,null=True)
-    phoneNumber = models.CharField(max_length=15,blank=True,null=True)
-    addressline1 = models.CharField(max_length=255,blank=True,null=True)
-    addressline2 = models.CharField(max_length=255,blank=True)
-    state = models.CharField(max_length=20,blank=True,null=True)
-    pin = models.CharField(max_length=20,blank=True,null=True)
-    is_deleted = models.BooleanField(default=False)
-    flag = models.BooleanField(default=False)
-    
-    def __str__(self):
-        return self.user.first_name
+
       
 class OrderItem(models.Model):
     order=models.ForeignKey(Order,on_delete=models.CASCADE)

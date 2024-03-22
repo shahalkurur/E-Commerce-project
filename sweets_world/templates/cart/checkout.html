@@ -12,19 +12,27 @@
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-tittle mb-4">Billing Address</h4>
+                            {% if address %}
                             <h6>Current Address</h6>
-                            {% for i in addrs %}
+                            {% for i in address %}
                             <div class="address-item">
                                 <input type="radio" name="address" id="address_{{ forloop.counter }}" value="{{ i.id }}">
                                 <label for="address_{{ forloop.counter }}">{{ i.first_name }} {{ i.last_name }} 
-                                     {{ i.addressline1 }} - {{ i.phoneNumber }} - {{ i.state }}</label>
+                                     {{ i.addressline1 }} - {{ i.state }}</label>
                             </div>
                             {% endfor %}
                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addressModal">New Address</button>
 
+                            {% else %}
                             <!-- Address Modal -->
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addressModal">Add Address</button>
+                            {% endif %}
                             
                         </div>
+                    </div>
+                    <div class="card ">
+                        
+
                     </div>
                 </aside>
                 <aside class="col-lg-6">
@@ -107,15 +115,18 @@
                             <input type="hidden" value="COD" name="paymentmode">
                             {% endif %}
                             <input type="hidden" value="{{grand}}" name="total">
-                            <button type="submit" class="btn btn-secondary btn-block">COD| Place Order</button><br>
-                            <button type="submit" class="btn btn-secondary btn-block razor_pay">Razor Pay</button><br>
+                            
+                            <button type="submit" class="btn btn-secondary btn-block" onclick="return validateAddress()" >COD | Place Order</button><br>
+
                             <div id="paypal-button-container"></div>
                         </div>
                     </div>
                 </aside>
             </div>
         </form>
-        <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel" aria-hidden="true">
+
+        <!-- form of modal -->
+                          <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel" aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
@@ -125,27 +136,35 @@
                                             </button>
                                         </div>
                                         <div class="modal-body">
-                                            <form id="address-form" action="{% url 'add_address' %}" method="POST">
-                                                {% csrf_token %}-------------------
+                                            <form id="address-form" action="" method="POST">
+                                                {% csrf_token %}
                                                 <div class="form-group">
                                                     <label for="first_name">First Name</label>
                                                     <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter First Name">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="last_name">Last Name</label>
-                                                    <input type="text" class="form-control" id="last_name" placeholder="Enter Last Name">
+                                                    <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Enter Last Name">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="addressLine">Address Line</label>
-                                                    <input type="text" class="form-control"  id="addressLine" placeholder="Enter Address">
+                                                    <input type="text" class="form-control"  id="addressLine" name="addressLine" placeholder="Enter Address">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="phoneNumber">Phone Number</label>
-                                                    <input type="text" class="form-control" id="phoneNumber" placeholder="Enter Phone Number">
+                                                    <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Enter Phone Number">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="country">country</label>
+                                                    <input type="text" class="form-control" id="country" name="country" placeholder="Enter country">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="state">State</label>
-                                                    <input type="text" class="form-control" id="state" placeholder="Enter State">
+                                                    <input type="text" class="form-control" id="state" name="state" placeholder="Enter State">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="pin">Pin</label>
+                                                    <input type="text" class="form-control" id="pin" name="pin" placeholder="Enter Pincode">
                                                 </div>
                                                 <button type="submit" name="formadres" class="btn btn-primary ">Save Address</button>
                                             </form>
@@ -174,20 +193,16 @@
     },
     onClick: function (data, actions) {
         // Validation
-        var fname = $("[name='first_name']").val();
         
-        var lname = $("[name='lastname']").val();
-        var email = $("[name=email]").val();
-        var phonenumber = $("[name=phonenumber]").val();
-        var address = $("[name=address]").val();
-        var city = $("[name=city]").val();
-        var country = $("[name=country]").val();
-        var state = $("[name=state]").val();
+        var address = $("[name=address]:checked").val();
+        var total = $("[name=total]").val();
+        
         var token = $("[name='csrfmiddlewaretoken']").val();
 
         // Check values are not null
-        if (fname == "" || lname == "" || email == "" || address == "" || phonenumber == "" || city == "" || country == "" || state == "") {
-            swal("Alert!", "All fields are mandatory!", "error");
+        if ( !address ) {
+            console.log("Address not selected!");
+            swal("Alert!", "select an address!", "error");
             return false;
         } else {
             return true;
@@ -207,28 +222,19 @@
     onApprove: function (data, actions) {
         return actions.order.capture().then(function (orderData) {
             // Capture form data
-            var fname = $("[name='first_name']").val();
-            var lname = $("[name='lastname']").val();
-            var email = $("[name=email]").val();
-            var phonenumber = $("[name=phonenumber]").val();
+            
             var address = $("[name=address]").val();
-            var city = $("[name=city]").val();
-            var country = $("[name=country]").val();
-            var state = $("[name=state]").val();
+            var total = $("[name=total]").val();
+            
             var token = $("[name='csrfmiddlewaretoken']").val();
 
             
 
             // Prepare data for AJAX request
             var requestData = {
-                "first_name": fname,
-                'lastname': lname,
-                "email": email,
-                "phonenumber": phonenumber,
+                
                 "address": address,
-                "city": city,
-                "country": country,
-                "state": state,
+                "total":total,
                 "paymentmode": "Paid by paypal",
                 "payment_id": orderData.id,
                 "csrfmiddlewaretoken": token
@@ -245,14 +251,17 @@
                 },
                 success: function (response) {
     console.log('Server Response:', response);
+    console.log('Order Data:', orderData);
+
 
     if (response && response.status) {
         swal("Congratulations!", response.status, "success").then((value) => {
-            window.location.href = '/order_success';
+           
         });
     } else {
         swal("Congratulations!", "Order placed successfully.", "success").then((value) => {
-            window.location.href = '/order_success';
+            window.location.href = '/order_success/';
+
         });
     }
 }
@@ -286,7 +295,7 @@
                     console.log('Form submitted successfully');
                     
                     // Reload the page after a successful submission
-                    location.reload();
+                    // window.location.reload();
                 },
                 error: function (error) {
                     // Handle any errors here if needed
@@ -297,69 +306,69 @@
     });
 </script>
 
+<script>
+    // Wait for the document to be ready
+$(document).ready(function() {
+    
+    // Add a listener to the form submission event
+    $("#address-form").submit(function(event) {
+        // Prevent the default form submission behavior
+        event.preventDefault();
 
+        // Validate form fields
+        var firstName = $("#first_name").val().trim();
+        var lastName = $("#last_name").val().trim();
+        var addressLine = $("#addressLine").val().trim();
+        var phoneNumber = $("#phoneNumber").val().trim();
+        var country = $("#country").val().trim();
+        var state = $("#state").val().trim();
+        var pin = $("#pin").val().trim();
 
+        var phoneRegex = /^\d{10}$/; // Matches a 10-digit number
+        var pinRegex = /^\d{4}$/; // Matches a 6-digit number
 
+        // Validate phone number
+        if (!phoneRegex.test(phoneNumber)) {
+            alert("Please enter a valid 10-digit phone number.");
+            return;
+o        }
 
-<!-- <script>
-    $(document).ready(function () {
-        $('#address-form').on('submit', function (e) {
-            // Form validation
-            var isValid = true;
-
-            var name = $('#first_name').val();
-            var email = $('#email').val();
-            var phone = $('#phoneNumber').val();
-            var address = $('#addressLine').val();
-            var pin = $('#pin').val();
-
-            if (name.trim().length <= 3 || /\d/.test(name)) {
-                alert('Full Name should have more than 3 characters and should not contain numbers.');
-                isValid = false;
-            }
-
-            if (email.trim() === '' || !validateEmail(email)) {
-                alert('Please enter a valid email address.');
-                isValid = false;
-            }
-
-            if (phone.trim() === '' || !validatePhoneNumber(phone)) {
-                alert('Phone number should have 10 digits and no other characters.');
-                isValid = false;
-            }
-
-            if (address.trim().length <= 5) {
-                alert('Address should have more than 5 characters.');
-                isValid = false;
-            }
-
-            if (!validatePinCode(pin)) {
-                alert('Pin code should have 6 digits and no other characters.');
-                isValid = false;
-            }
-
-            if (!isValid) {
-                e.preventDefault(); // Prevent form submission if validation fails
-            }
-        });
-
-        // Function to validate email
-        function validateEmail(email) {
-            var emailRegex = /^[a-zA-Z0-9._-]+@gmail\.com$/;
-            return emailRegex.test(email);
+        // Validate PIN code
+        if (!pinRegex.test(pin)) {
+            alert("Please enter a valid 6-digit PIN code.");
+            return;
+        }
+        // Check if any field is empty
+        if (firstName === "" || lastName === "" || addressLine === "" || phoneNumber === "" || country === "" || state === "" || pin === "") {
+            // Display error message
+            alert("All fields are required.");
+            return; // Stop further execution
         }
 
-        // Function to validate phone number
-        function validatePhoneNumber(phone) {
-            return /^[0-9]{10}$/.test(phone);
-        }
-
-        // Function to validate pin code
-        function validatePinCode(pin) {
-            return /^[0-9]{6}$/.test(pin);
-        }
+        // If all fields are filled, submit the form
+        this.submit();
     });
-</script> -->
+});
+
+</script>
+<script>
+    function validateAddress() {
+        var selectedAddress = $("input[name='address']:checked").val();
+        if (!selectedAddress) {
+            swal("Alert!", "Please select an address!", "error");
+            return false; // Prevent form submission
+        }
+        return true; // Allow form submission if address is selected
+    }
+</script>
+
+
+
+
+
+
+
+
 
 
 

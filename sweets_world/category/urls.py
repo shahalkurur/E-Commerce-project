@@ -18,7 +18,9 @@ urlpatterns = [
     path('add_address/', views.add_address, name='add_address'),
     path('check_out',views.check_out,name='check_out'),
     path('placeorder',views.placeorder,name='placeorder'),
+    path('order_success/',views.order_success,name='order_success'),
     path('order_success/<int:order_id>/',views.order_success,name='order_success'),
+
     # path('add_addrs/',views.add_adrs,name='add_addrs'),
 
 
@@ -33,7 +35,7 @@ urlpatterns = [
     path('order_details/<str:pk>/',views.order_details,name='order_details'),
     
     path('cancel_order/<int:pk>/',views.cancel_order,name='cancel_order'),
-    path('proceed_to_pay/',views.razor_pay),
+   # path('proceed_to_pay/',views.razor_pay),
     
     path('wishlist',views.wish_list,name='wishlist'),
     path('addto_wishlist',views.addtowishlist,name='addto_wishlist'),

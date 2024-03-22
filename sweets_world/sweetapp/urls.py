@@ -30,6 +30,7 @@ urlpatterns = [
     path('manage_orders/',views.manage_orders,name='manage_orders'),
     path('manage_coupens/',views.manage_coupens,name='manage_coupens'),
     path('manage_offer/',views.manage_offer,name='manage_offer'),
+    path('sale_graph/',views.sale_graph,name='sale_graph'),
 
      path('generate-pdf/',views.generate_pdf,name='generate-pdf'),
     path('generatepdf/<int:id>/',views.generatepdf,name='generatepdf'),
@@ -60,9 +61,14 @@ urlpatterns = [
     path('monthly_sales/', views.monthly_sales, name='monthly_sales'),
     path('year_sales/', views.year_sales, name='year_sales'),
     path('period_of_sale/', views.period_of_sale, name='period_of_sale'),
+    path('generate_pdf/', views.generate_pdf, name='generate_pdf'),
+
+
 
 
     path('cat_by_prod/<int:id>',views.cat_by_prod,name='cat_by_prod'),
+    path('cat_by_prod/',views.cat_by_prod,name='cat_by_prod'),
+
 
     path('product_detail/<int:id>/', views.product_detail, name='product_detail')
     

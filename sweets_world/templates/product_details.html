@@ -90,6 +90,7 @@
     {%endif%}
 {% endblock %}
 {% block scripts %}
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
     // Handle click on "Add to Cart" button
     $('.button-plus').click(function (e) {
@@ -156,9 +157,10 @@
                 
                 csrfmiddlewaretoken: token
             },
-            // success: function (response) {
-            //     window.location.href = "http://127.0.0.1:8000/wishlist";// easy way to laod to specified page after action
-            // },
+             success: function (response) {
+                swal("Product added to Wishlist successfully.")
+                 //window.location.href = "http://127.0.0.1:8000/wishlist";// easy way to laod to specified page after action
+             },
            
         });
     });

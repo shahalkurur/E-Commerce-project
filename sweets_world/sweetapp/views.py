@@ -95,7 +95,7 @@ def logout_user(request):
   
     auth.logout(request)
     messages.success(request,'you are logged out')
-    return redirect('login')#(request,'index.html')
+    return redirect('home')#(request,'index.html')
 
 
 
@@ -274,6 +274,7 @@ def unblock_user(request,id):
 def admin_dsh(request):
     if request.user.is_authenticated:
         
+        
         return render(request,'adm/base.html')
     else:
         return render(request,'app/home.html')
@@ -323,7 +324,7 @@ def delete_category(request,id):
 
 
 def manage_products(request):
-    Products=products.objects.filter(status=0).order_by('id')
+    Products=products.objects.filter(is_available='True').order_by('id')
     context={'Products':Products}
     return render(request,'adm/manage_products.html',context)
 
@@ -418,10 +419,22 @@ def manage_orders(request):
 def status_update(request,pk):
         if request.method=='POST':
              new_status=request.POST.get('status')
-             print(pk)
-             print(new_status)
              user=request.user
+             
              order=Order.objects.filter(id=pk).first()
+             
+             custom_user=CustomUser.objects.get(id=pk)
+             custom_user.my_wallet += order.total_price
+             custom_user.save()
+             print('www',custom_user.my_wallet,request.user)
+
+             if new_status == 'Cancel':
+                wal=Wallet.objects.create(
+                user=user,
+                amount=order.total_price,
+                order=order)
+                wal.save()
+                print(wal.amount)
              
              order.status=new_status
              order.save()
@@ -476,10 +489,9 @@ def add_category_offer(request):
         percentage = request.POST.get('percentage')
         start_date_str = request.POST.get('startDate')
         end_date_str = request.POST.get('endDate')
-        print(category_id,discount_type,percentage,start_date_str,end_date_str)
 
         Cat_id = category.objects.get(id=category_id)
-        print(Cat_id)
+        
 
         start_date_naive = datetime.strptime(start_date_str, '%Y-%m-%d')
         end_date_naive = datetime.strptime(end_date_str, '%Y-%m-%d')
@@ -630,14 +642,14 @@ def generatepdf(request,id):
     lines.append("Invoice:")    
     for o in orders:
         for i in order_items:
-            lines.append(f"Name: {o.f_name} {o.l_name}")
+            lines.append(f"Name: {o.address.first_name} {o.address.last_name}")
             lines.append(f"Product: {i.product.prod_name}")
             lines.append(f"Quantity: {i.quandity}")
             lines.append(f"Price: {i.product.price}")
             lines.append(f"Payment Type: {o.payment_mode}")
             lines.append(f"Order Id: {o.tracking_no}")
             lines.append(f"Amount: {o.total_price}")
-            lines.append(f"Address: {o.address},phno:{o.mobile},pin:{o.state}")
+            lines.append(f"Address: {o.address.addressline1},phno:{o.address.phone_number},state:{o.address.state}")
             lines.append("")
     for line in lines:
         textob.textLine(line)
@@ -662,19 +674,38 @@ def generatepdf(request,id):
 
 
 def cat_by_prod(request,id):
- 
+        catid=id
+        print('sss')
         try:
             cat = category.objects.get(id=id)
         except category.DoesNotExist:
         # Handle the case where the category with the given id doesn't exist
-             return HttpResponseNotFound("Category not found")    
-        prod=products.objects.filter(category=cat,).order_by('price')
+             return HttpResponseNotFound("Category not found")
+        sortBy = request.POST.get('sort')
+        print(sortBy)
+        if sortBy == "Position" :
+            prod= products.objects.filter(category=cat,is_available=True)
+        elif sortBy == 'Name Ascen':
+            prod= products.objects.filter(category=cat).order_by('prod_name')
+            
+        elif sortBy == 'Name Decen':
+            prod= products.objects.filter(category=cat,is_available=True).order_by('-prod_name')
+        elif sortBy == 'Price Ascen':
+            prod= products.objects.filter(category=cat,is_available=True).order_by('price')
+        elif sortBy == 'Price Decen':
+            prod= products.objects.filter(category=cat,is_available=True).order_by('-price')   
+        else:
+            prod=products.objects.filter(category=cat).order_by('id') 
+        print(prod)
+            
        
         page = request.GET.get('page', 1)
-        prod_paginator=Paginator(prod,2)
+        prod_paginator=Paginator(prod,4)
         prod_list=prod_paginator.get_page(page)
+        
+        
 
-        context={'Products':prod_list}
+        context={'Products':prod_list,'cat_id':catid}
         return render(request,'cat_by_prod.html',context)
 
 def product_detail(request,id):
@@ -717,7 +748,7 @@ def daily_sales_report(request):
              't_amount':t_amount,
              't_order':t_order, 
              }
-    return render(request, 'adm/base.html',context)
+    return render(request, 'adm/sales_graph.html',context)
 
 def monthly_sales(request):
     
@@ -775,6 +806,176 @@ def period_of_sale(request):
                  'to_date':to_date}
 
     return render(request, 'adm/base.html',context)
+
+from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
+from django.db.models import Count, Avg
+import calendar
+
+
+def sale_graph(request):
+    active_users = CustomUser.objects.filter(is_active=True).exclude(is_superuser=True)
+    total_active_users_count=active_users.count()
+    total_orders_count = Order.objects.count()
+
+    total_income = Order.objects.filter(Q(status='Delivered')|Q(status='Complete')).aggregate(total_income=Sum('total_price'))['total_income'] or 0
+    
+    orders=Order.objects.filter(Q(status='Delivered')|Q(status='Complete'))
+    
+   
+    
+    # Monthly sales data
+    orders_month_report = (
+        Order.objects.annotate(month=ExtractMonth("created_at"))
+        .values("month")
+        .annotate(monthly_orders_count=Count("id"))
+        .annotate(monthly_sales=Sum("total_price"))
+        .values("month", "monthly_orders_count", "monthly_sales"))
+
+    month = []
+    total_orders_per_month = []
+    total_sales_per_month = []
+
+    for order in orders_month_report:
+        month.append(calendar.month_name[order["month"]])
+        total_orders_per_month.append(order["monthly_orders_count"])
+        total_sales_per_month.append(order["monthly_sales"])
+    # print('month',month)
+    # print(total_orders_per_month)
+    # print(total_sales_per_month)
+
+
+    current_month = timezone.now().month
+    current_year = timezone.now().year
+    
+    
+    orders_daily_report = (
+        Order.objects.filter(Q(status='Delivered')|Q(status='Complete'))  # Adjust the status filter as needed
+        .filter(created_at__month=current_month,created_at__year=current_year)
+        .annotate(day=ExtractDay("created_at"))
+        .values("day")
+        .annotate(daily_orders_count=Count("id"))
+        .annotate(daily_sales=Sum("total_price"))
+        .values("day", "daily_orders_count", "daily_sales")
+)
+
+    day = []
+    total_orders_per_day = []
+    total_sales_per_day = []
+
+    for order in orders_daily_report:
+        day.append(order["day"])
+        total_orders_per_day.append(order["daily_orders_count"])
+        total_sales_per_day.append(order["daily_sales"])
+    print(day)
+    print(total_orders_per_day)
+    print(total_sales_per_day)
+
+    product_data = []
+    productss=products.objects.filter(is_available='True')
+    for product in productss:
+        total_quantity_sold = OrderItem.objects.filter(product=product).aggregate(Sum('quandity'))['quandity__sum'] or 0
+        total_incom = total_quantity_sold * product.price
+        
+        product_data.append({
+            'product': product,
+            'total_quantity_sold': total_quantity_sold,
+            'total_incom': total_incom,
+        })
+    
+    # Yearly sales count
+    orders_year_report = (
+        Order.objects.annotate(year=ExtractYear("created_at"))
+        .values("year")
+        .annotate(yearly_orders_count=Count("id"))
+        .annotate(yearly_sales=Sum("total_price"))
+        .values("year", "yearly_orders_count", "yearly_sales")
+    )
+    year = []
+    total_orders_per_year = []
+    total_sales_per_year = []
+
+    for order in orders_year_report:
+        year.append(order["year"])
+        total_orders_per_year.append(order["yearly_orders_count"])
+        total_sales_per_year.append(order["yearly_sales"])
+    
+
+
+    order_items = Order.objects.aggregate(order_sum=Sum("total_price"))
+    
+    data={
+        'product_data':product_data,
+        'orders':orders,
+        'total_income':total_income,
+        'total_orders_count':total_orders_count,
+        'total_orders_per_day':total_orders_per_day,
+        'total_sales_per_day':total_sales_per_day,
+        "total_active_users_count": total_active_users_count,
+        "sales": order_items,
+        "month": month,
+        "total_orders_per_month": total_orders_per_month,
+        "total_sales_per_month": total_sales_per_month,
+
+        "year": year,
+        "total_orders_per_year": total_orders_per_year,
+        "total_sales_per_year": total_sales_per_year,
+
+        "day": day,
+        "total_orders_per_day": total_orders_per_day,
+        "total_sales_per_day": total_sales_per_day,
+
+    }
+    return render(request,'adm/sales_graph.html',data)
+
+
+import io
+from django.http import FileResponse
+from reportlab.pdfgen import canvas
+
+def generate_pdf(request):
+    buffer = io.BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    pdf = canvas.Canvas(buffer,pagesize=letter)
+
+    orders = Order.objects.all()
+
+   
+    headers = ["Customer", "CONTACT",'ORDER NO', "DATE", "Total Paid"]
+    col_widths = [pdf.stringWidth(header, "Helvetica", 25) for header in headers]
+
+
+    col_widths[2] += 20 
+
+
+    line_height = 34
+
+    
+    table_start_x = 100  
+    y_position = 750
+
+    for i, header in enumerate(headers):
+        pdf.drawString(table_start_x + sum(col_widths[:i]), y_position - line_height, header)
+
+    for order in orders:
+        y_position -= line_height
+        for i, value in enumerate([order.address.first_name, order.address.phone_number,order.tracking_no, order.created_at.strftime('%Y-%m-%d'), str(order.total_price)]):
+           
+
+            if i == 2:
+                pdf.setFont("Helvetica", 8)
+                pdf.drawString(table_start_x + sum(col_widths[:i]), y_position - line_height, value)
+                pdf.setFont("Helvetica", 10)  # Resetting the font size to the default
+            else:
+                pdf.drawString(table_start_x + sum(col_widths[:i]), y_position - line_height, str(value))
+
+    pdf.save()
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="orders.pdf"'
+    return response
+
 
 
 

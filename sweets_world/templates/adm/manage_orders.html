@@ -40,14 +40,14 @@
                     </select>
                 </td>
 
-                <td>{{ item.address }}</td>
+                <td>{{ item.address.addressline1 }} {{item.address.state}} {{item.address.pin}}</td>
 
                 <td>
                     <button type="submit" class="btn btn-info">Update</button>
                 </td>
-                <td>
+                <!-- <td>
                     <a href="{% url 'generate-pdf' %}" class="btn btn-secondary">DownloadPDF</a>
-                </td>
+                </td> -->
                 
                 
             </tr>

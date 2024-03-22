@@ -95,22 +95,23 @@
               Coupens
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span data-feather="bar-chart-2"></span>
-              Reports
-            </a>
-          </li>
+          
           <li class="nav-item">
             <a class="nav-link" href="{% url 'manage_offer' %}">
               <span data-feather="gift"></span>
               Offers
             </a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'sale_graph' %}">
+              <span data-feather="file-text"></span>
+              Sales Report
+            </a>
+          </li>
         </ul>
 
         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-          <span>Saved reports</span>
+          <!-- <span>Saved reports</span> -->
           <a class="link-secondary" href="#" aria-label="Add a new report">
             <span data-feather="plus-circle"></span>
           </a>
@@ -119,27 +120,22 @@
           <li class="nav-item">
             <a class="nav-link" href="#">
               <span data-feather="file-text"></span>
-              Current month
+              <!-- Current month -->
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">
               <span data-feather="file-text"></span>
-              Last quarter
+              <!-- Last quarter -->
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">
               <span data-feather="file-text"></span>
-              Social engagement
+              <!-- Social engagement -->
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span data-feather="file-text"></span>
-              Year-end sale
-            </a>
-          </li>
+          
         </ul>
       </div>
     </nav>
@@ -241,6 +237,9 @@
                           </tr>
                       </tbody>
                   </table>
+                  <div class="col-12" style="height: 200px; display: flex; justify-content: center; margin: 0 auto;">
+                    <canvas id="myChart" width="100" height="100"></canvas>                       
+                  </div>
               {% endif %}
           </div>
       
@@ -277,6 +276,9 @@
                           </tr>
                       </tbody>
                   </table>
+                  <div class="col-12" style="height: 200px; display: flex; justify-content: center; margin: 0 auto;">
+                    <canvas id="myChart" width="100" height="100"></canvas>                       
+                  </div>
               {% endif %}
           </div>
         </div>
@@ -305,7 +307,7 @@
           </form>
           {% if from_date %}
                   <p>sales data of Period :<b>({{from_date}})--({{to_date}})</b></p>
-                  <table class="table table-hover-bordered border rounded ">
+                  <!-- <table class="table table-hover-bordered border rounded ">
                       <thead>
                           <tr class="table-info">
                               <td>Total Orders</td>
@@ -318,10 +320,15 @@
                               <td>{{ t_amount }}</td>
                           </tr>
                       </tbody>
-                  </table>
+                  </table> -->
+                  <div>
+                    <canvas id="salesChart"></canvas>
+                  </div>
               {% endif %}
             
           </div>
+         
+          
         </div>
           
       
@@ -330,16 +337,44 @@
       
 
  
-      
-    
-  
-    
-
-    
-
 
     
   <!--  SCRIPT FOR YEAR SELECTION OF YEAR SALES -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // JavaScript code to render the line chart
+    const salesData = {
+        labels: [{% for o in order %}'{{ o.created_at|date }}', {% endfor %}],
+        datasets: [{
+            label: 'Total Sales',
+            data: [{% for o in order %}'{{ o.total_price }}', {% endfor %}],
+            fill: false,
+            borderColor: 'rgb(75, 192, 192)',
+            lineTension: 0.1
+        }]
+    };
+    
+    const salesChart = new Chart(document.getElementById('salesChart'), {
+        type: 'line',
+        data: salesData,
+        options: {
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                        unit: 'day'
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+    </script>
+    
   
   <script>
     let dateDropdown = document.getElementById('date-dropdown'); 
@@ -361,6 +396,8 @@
     </main>
   </div>
 </div>
+
+
 
 
 <script src="{% static 'admn/bootstrap.bundle.min.js' %}"></script>

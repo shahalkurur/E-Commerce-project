@@ -84,6 +84,12 @@ def add_cart(request):
           prd=request.POST.get('prod_qty')
           print(Prod_id,prd)
           prod_check=products.objects.get(id=Prod_id)
+          wish_item = request.POST.get('wish_id')
+          print(wish_item)
+          
+          #delete from wish list
+          wish=Wishlist.objects.get(product=Prod_id )
+          wish.delete()
           
               
               
@@ -93,7 +99,7 @@ def add_cart(request):
                      
                      return JsonResponse({'error': 'Product alredy in cart'})
                 else:
-                     product_qty = float(request.POST.get('prod_qty'))#bcose model stock field was float
+                     product_qty = float(prd)#bcose model stock field was float
                      
                      if prod_check.stock >= product_qty:
                         Cart.objects.create(product_id=Prod_id,
@@ -261,9 +267,9 @@ def check_out(request):
     coupen=None
     total_amount=0
     grnd_total=0
-    user_profile=Profile.objects.filter(user=user)
     cart_items=Cart.objects.filter(user=user)
     addrs=Address.objects.filter(user=user,is_deleted=False)
+    
     
     
                            
@@ -292,52 +298,51 @@ def check_out(request):
           pass
     
     
-    if wal.my_wallet >= grnd_total or wal.my_wallet >=total_amount and total_amount!=0 :
+    if wal.my_wallet > grnd_total or wal.my_wallet >total_amount and total_amount!=0 :
+        
         flag='True'
-    elif wal.my_wallet < (grnd_total or total_amount):
+    else :#wal.my_wallet < (grnd_total or total_amount):
         flag='False'
     
-    context={'flag':flag,'amount':total_amount,'wallet':wal,'addrs':addrs,
+    context={'flag':flag,'amount':total_amount,'wallet':wal,'address':addrs,
              'grand':grnd_total,'coupen':coupen,'cart_items':cart_items}
     return render(request,'cart/checkout.html',context)
 
 
 @login_required(login_url='login')
 def add_address(request):
-    if request.method=="POST":
-        fname=request.POST.get('first_name')
-        lname=request.POST.get('last_name')
-        email=request.POST.get('email')
-        ph=request.POST.get('phoneNumber')
-        add=request.POST.get('address')
-        state=request.POST.get('state')
-        pin=request.POST.get('pin')
-        print(fname,state,add)
-        print('kkkkkk')
-        return redirect('check_out')
+    if request.method == "POST":
+        fname = request.POST.get('first_name')
+        lname = request.POST.get('last_name')
+        email = request.POST.get('email')
+        ph = request.POST.get('phoneNumber')
+        addrs = request.POST.get('addressLine')
+        country = request.POST.get('country')
+        state = request.POST.get('state')
+        pin = request.POST.get('pin')
         
-        
-        
-        # adrs=Address.objects.create(
-        #     user=request.user,
-        #     first_name=fname,
-        #     last_name=lname,
-        #     email=email,
-        #     phoneNumber=ph,
-        #     addressline1=add,
-        #     state=state,
-        #     pin=pin
-            
-        # )
-        # print(adrs)
-        # print(adrs.id)
 
-    pass    
-    context={
+        #Create a new address object
+        address = Address.objects.create(
+            user=request.user,
+            first_name=fname,
+            last_name=lname,
+            email=email,
+            phone_number=ph,
+            addressline1=addrs,
+            country=country,
+            state=state,
+            pin=pin
+        )
+
         
-    }
-        
-    return render(request,'checkout.html',context)
+
+
+        return render(request, 'cart/checkout.html')
+
+    else:
+        # Handle GET request here if needed
+        return render(request, 'cart/checkout.html')
 
 
 @login_required(login_url='login')
@@ -347,14 +352,18 @@ def placeorder(request):
         
         current_user=CustomUser.objects.filter(id=request.user.id).first()
         address_id=request.POST.get('address')
-        
-        addrs=Address.objects.filter(id=address_id).first()
-        # print(addrs.first_name)
-        
+        if address_id:
+            addrs=Address.objects.get(id=address_id)
+            print(f'address {address_id}')
+        else:
+            print('fff')
+            messages.error(request,"Dont have address")
+            return redirect('check_out')
 
         #checking wallet have sufficient amount if ;then use
         
         pay_mode=request.POST.get('paymentmode')
+        print(pay_mode)
        
 
         if pay_mode=='wallet':
@@ -369,47 +378,14 @@ def placeorder(request):
                     return redirect('check_out')
         else:
             total=request.POST.get('total')
+
         neworder=Order()
-        if address_id:
-            neworder.user=request.user
-            neworder.f_name=addrs.first_name
-            neworder.l_name=addrs.last_name
-            neworder.address=addrs.addressline1
-            neworder.mobile=addrs.phoneNumber
-            neworder.state=addrs.state
-        else:
-            neworder.user=request.user
-            neworder.f_name=request.POST.get('first_name')
-            print(f'neworder-{neworder.f_name}')
-            neworder.l_name=request.POST.get('')
-            neworder.address=request.POST.get('')
-            neworder.mobile=request.POST.get('')
-            neworder.state=request.POST.get('')
-        #     # current_user.save()
-
-        # if not Profile.objects.filter(user=request.user):
-        #     profile_user=Profile()
-        #     profile_user.address=request.POST.get('address')
-        #     profile_user.country=request.POST.get('country')
-        #     profile_user.state=request.POST.get('state')
-        #     profile_user.city=request.POST.get('city')
-        #     # profile_user.save()
-
-
-                # neworder=Order()
-                # neworder.user=request.user
-                # neworder.f_name=request.POST.get('fname')
-                # neworder.l_name=request.POST.get('lastname')
-                # neworder.email=request.POST.get('email')
-                # neworder.mobile=request.POST.get('phonenumber')
-                # neworder.address=request.POST.get('address')
-                # neworder.country=request.POST.get('country')
-                # neworder.state=request.POST.get('state')
-                # neworder.pincode='121'
-                # neworder.city=request.POST.get('city')
-                # neworder.payment_mode=request.POST.get('paymentmode')
-                # neworder.payment_id=request.POST.get('payment_id')
-                # neworder.total_price=total
+        neworder.user=request.user
+        neworder.address=addrs
+        neworder.payment_mode=request.POST.get('paymentmode')
+        neworder.payment_id=request.POST.get('payment_id')
+        neworder.total_price=total
+        
         
         #instead of calculating send total amont from the page
         # cart=Cart.objects.filter(user=request.user)
@@ -422,36 +398,40 @@ def placeorder(request):
         
         
 
-        # trck_no=random.randint(111111,999999)
-        # while Order.objects.filter(tracking_no=trck_no) is None:
-        #     trck_no=random.randint(111111,999999)
-        # neworder.tracking_no=trck_no
-        # neworder.save()
+        trck_no=random.randint(111111,999999)
+        while Order.objects.filter(tracking_no=trck_no) is None:
+            trck_no=random.randint(111111,999999)
+        neworder.tracking_no=trck_no
+        neworder.save()
+        
+        
 
         neworder_items=Cart.objects.filter(user=request.user)
-        # for item in neworder_items:
-        #     OrderItem.objects.create(
-        #         order=neworder,
-        #         price=item.product.price,
-        #         product=item.product,
-        #         quandity=item.quandity
-        #     )
+        for item in neworder_items:
+            OrderItem.objects.create(
+                order=neworder,
+                price=item.product.price,
+                product=item.product,
+                quandity=item.quandity
+            )
         #to update product stock in product table
-            # order_product=products.objects.filter(id=item.product_id).first()
-            # if order_product:
-            #     order_product.stock=order_product.stock-item.quandity
-            #     order_product.save()
-        #to clear user's cart
-        # Cart.objects.filter(user=request.user).delete()
+            order_product=products.objects.filter(id=item.product_id).first()
+            if order_product:
+                order_product.stock=order_product.stock-item.quandity
+                order_product.save()
 
-        paymode=request.POST.get('paymentmode')
+        #to clear user's cart
+        Cart.objects.filter(user=request.user).delete()
         
-        if paymode=='Paid by paypal':
-             JsonResponse({'status':"your order hasbeen placed by paypal"})
+        if pay_mode=='Paid by paypal':
+            messages.success(request,'your order hasbeen placed')     
         else:
             messages.success(request,'your order hasbeen placed')
+        
 
-            return HttpResponse('order_success')  
+        return redirect('order_success')
+            
+
     else :
         return redirect ('/')
      
@@ -464,7 +444,7 @@ def user_dashboard(request):
     ord_count=orders.count()
     
     wal=CustomUser.objects.get(email=request.user)
-    print(type(wal.my_wallet))
+    print((wal.my_wallet))
 
     
     return render(request,'dashboard.html',{'ord_count':ord_count,'wallet':wal})
@@ -541,7 +521,7 @@ def order_details(request,pk):
     orders=Order.objects.get(tracking_no=pk,user=user)
     print(orders)
     orderitem=OrderItem.objects.filter(order=orders)
-    print(orderitem)
+    print('order',orderitem)
     for i in orderitem:
         sub_total += i.product.price * i.quandity
         
@@ -557,13 +537,16 @@ def order_details(request,pk):
 
 def cancel_order(request,pk):
         order=Order.objects.get(id=pk)
+
+        print(order,pk)
         
         custom_user=CustomUser.objects.get(email=request.user)        
         orderitems=OrderItem.objects.filter(order_id=pk)
         
 
         for orderitem in orderitems:
-             orderitem.product.stock +=orderitem.quandity  #return product  stock to server
+             orderitem.product.stock +=orderitem.quandity
+             print(orderitem.product.stock)  #return product  stock to server
              orderitem.product.save()
 
         if  order.status=='Delivered' or order.status=='Complete':
@@ -573,6 +556,7 @@ def cancel_order(request,pk):
                 order=order
             )
             wal.save()
+            
             # print(type(order.total_price),order.total_price)
             # print(custom_user.my_wallet)
             custom_user.my_wallet += order.total_price # round(order.total_price, 2)
@@ -592,33 +576,18 @@ def cancel_order(request,pk):
 
          # razor pay functions
 
-def razor_pay(request):
-    cart_items=Cart.objects.filter(user=request.user)
-    total=0
-    grnd_total=0
-    for item in cart_items:
-        total += item.product.price* item.quandity
-    tax=(2 * total) / 100
-    grnd_total=tax+total
-    
 
-    context={'grand_total':grnd_total,'cart_items':cart_items}
-    print(grnd_total)
-    return JsonResponse({
-        'grand_total':grnd_total,
-        
-    })
 
 def orders(request):
     return HttpResponse('my order')
 
 
-def order_success(request,order_id):
-    print(order_id)
-    neworder=Order.objects.get(id=order_id)
-    print(neworder.tracking_no,neworder.total_price)
+def order_success(request):
+    
+    #neworder=Order.objects.get()
+    #print(neworder.tracking_no,neworder.total_price)
 
-    return render(request,'dd.html',{'neworder':neworder})
+    return render(request,'dd.html')
 
 
 

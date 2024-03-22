@@ -1,4 +1,6 @@
+{% extends 'adm/base.html' %}
 
+{% block content %}
 
 
 
@@ -34,7 +36,7 @@
                         <div class="widget-content-wrapper text-white">
                             <div class="widget-content-left">
                                 <div class="widget-heading">Total Orders</div>
-                                <div class="widget-subheading">Last year expenses</div>
+                                <div class="widget-subheading"></div>
                             </div>
                             <div class="widget-content-right">
                                 <div class="widget-numbers text-white"><span>{{ total_orders_count }}</span>
@@ -108,8 +110,8 @@
                                             <div class="col-12"
                                                 style="height: 500px; display: flex; justify-content: center; margin: 0 auto;">
                                                 <!-- Inserting your canvas elements here -->
-                                                <canvas id="myDayChart" style="display: block;"></canvas>
-                                                <canvas id="myMonthChart" style="display: none;"></canvas>
+                                                <canvas id="myDayChart" style="display: none;"></canvas>
+                                                <canvas id="myMonthChart" style="display: block;"></canvas>
                                                 <canvas id="myYearChart" style="display: none;"></canvas>
                                             </div>
 
@@ -129,11 +131,11 @@
                                                         <tbody>
                                                             {% for order in orders %}
                                                             <tr>
-                                                                <th scope="row">{{ order.full_name }}</th>
-                                                                <td>{{ order.phone }}</td>
-                                                                <td>{{ order.address1 }}</td>
-                                                                <td>{{ order.created }}</td>
-                                                                <td>₹{{ order.total_paid }}</td>
+                                                                <th scope="row">{{ order.address.first_name }}</th>
+                                                                <td>{{ order.address.phone_number }}</td>
+                                                                <td>{{ order.address.addressline1 }}</td>
+                                                                <td>{{ order.created_at }}</td>
+                                                                <td>₹{{ order.total_price }}</td>
                                                                 <!-- Add more columns as needed -->
                                                             </tr>
                                                             {% endfor %}
@@ -146,8 +148,7 @@
 
                                             <!-- Download Buttons -->
                                             <div class="col-12 d-flex justify-content-end">
-                                                <a href="" class="btn btn-primary">Download
-                                                    PDF</a>
+                                                <a href="{% url 'generate_pdf' %}" class="btn btn-primary">Download</a>
                                             </div>
                                         </div>
                                         <h6 class="text-muted text-uppercase font-size-md opacity-5 font-weight-normal">
@@ -187,13 +188,13 @@
                         <tbody>
                             {% for data in product_data %}
                             <tr>
-                                <td>{{ data.product.title }}</td>
+                                <td>{{ data.product.prod_name }}</td>
                                 <td>
-                                    <img src="{{ data.product.image1.url }}" alt="{{ data.product.title }}" width="50">
+                                    <img src="{{ data.product.prod_image.url }}" alt="{{ data.prod_name }}" width="50">
                                 </td>
                                 <th scope="row">{{ data.product.id }}</th>
                                 <td>{{ data.total_quantity_sold }}</td>
-                                <td>₹{{ data.total_income }}</td>
+                                <td>₹{{ data.total_incom }}</td>
                                 <!-- Add more columns as needed -->
                             </tr>
                             {% endfor %}
@@ -203,6 +204,7 @@
                 </div>
             </div>
             <br><br>
+           
 
         </div>
 
@@ -217,9 +219,6 @@
     </div>
 
     </div>
-    <script src="http://maps.google.com/maps/api/js?sensor=true"></script>
-
-
     <script type="text/javascript"
         src="https://demo.dashboardpack.com/architectui-html-free/assets/scripts/main.js"></script>
 </body>
@@ -445,3 +444,14 @@
 </script>
 
 
+
+
+<!-- Your Chart.js and Toggle Theme Scripts here -->
+
+
+
+
+
+
+
+{% endblock %}
